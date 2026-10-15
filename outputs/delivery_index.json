@@ -16,18 +16,18 @@
   "artifact_inventory": [
     {
       "path": "outputs/result.json",
-      "size_bytes": 437456,
-      "sha256": "03404e950100fb600750ead5b7a305fb29478bdf300443d43ca66a9c22df6ae4"
+      "size_bytes": 462444,
+      "sha256": "9555b1d88e7b450dd16fe7b3e861c76144484006e48861c60f0501441ada180c"
     },
     {
       "path": "outputs/run_manifest.json",
-      "size_bytes": 10305,
-      "sha256": "c8582692edf20a4a62a2425bf179bf56d5b62fcd828102b20dbe21feeab21149"
+      "size_bytes": 10304,
+      "sha256": "3d0f9b6a7e9dc0df8dfa1ab3011e5b787b5568c72fc52527b8bd8bd691bb0e52"
     },
     {
       "path": "outputs/run_events.jsonl",
-      "size_bytes": 3720,
-      "sha256": "7744ee1c5ca49661c804f6549bfa387ff6f21011ededde6ae074d8341bd925af"
+      "size_bytes": 3719,
+      "sha256": "777492ffc783cac86d9816a0e0268b226af9671ce742e060bd8b3614276e94a6"
     },
     {
       "path": "outputs/evaluation/baseline_relation_evaluation.json",
