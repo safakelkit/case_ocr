@@ -161,6 +161,7 @@ Acceptance criteria:
 - [x] Add a concise Turkish purpose comment to every Python source, script, and test file.
 - [x] Add measured terminal progress for pipeline stages and page-based OCR, with a `--no-progress` opt-out.
 - [x] Document the verified clean-environment setup, tests, and seven-stage run as one copyable chain in README Section 5; retain per-stage, evaluation, and delivery-preparation commands in `RUNBOOK.local.md`.
+- [x] Add an early copyable quick-start block that clones the repository, creates `.venv`, installs `requirements.txt`, runs the tests, and executes the full pipeline.
 - [x] Document delivery artifacts, evaluation reports, source/configuration files, and engineering records in README Section 1.
 - [x] Add a compact source-code map for the core runtime and evaluation scripts, and state the per-file Turkish purpose-comment convention in README Section 1.
 - [x] Summarize the business problem, mandatory case scope, configuration boundary, and deliberate exclusions concisely in README Section 2.

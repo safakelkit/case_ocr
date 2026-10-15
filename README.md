@@ -4,7 +4,28 @@
 
 Bu repository; kaynak kodu, kullanılan vaka dokümanını, tekrar üretilebilir çalışma yapılandırmasını, otomatik testleri ve doğrulanmış örnek çalışma çıktılarını birlikte içerir. Uçtan uca son çalışma `completed_with_warnings` durumuyla tamamlanmıştır: zorunlu yedi aşamanın tamamı çalışmış, durdurma gerektiren kalite kapısı veya başarısız validasyon oluşmamış, OCR kaynaklı üç finansal kontrol ise değer uydurulmadan `incomplete` olarak raporlanmıştır.
 
-### 1.1. Öncelikli Teslim Artefaktları
+### 1.1. Hızlı Başlangıç
+
+Aşağıdaki blok macOS ve Python 3.11+ üzerinde repository'yi klonlar, gerekli sistem araçlarını ve sabitlenmiş Python bağımlılıklarını kurar, testleri çalıştırır ve yedi aşamalı pipeline'ı başlatır:
+
+```bash
+git clone https://github.com/safakelkit/case_ocr.git
+cd case_ocr
+
+brew install poppler tesseract tesseract-lang
+
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+python -m unittest discover -s tests -v
+ykt-case --config configs/default.json --stage all
+```
+
+İlk semantic çalışmada embedding modeli indirileceği için internet bağlantısı gerekebilir. Sonuçlar `outputs/` altında üretilir. Sistem aracı kontrolleri, çevrimdışı model kullanımı ve aşama bazlı komutlar için [Bölüm 5](#5-kurulum-ve-uçtan-uca-çalıştırma) ile [`RUNBOOK.local.md`](RUNBOOK.local.md) kullanılabilir.
+
+### 1.2. Öncelikli Teslim Artefaktları
 
 | Dosya | İçerik ve kullanım amacı |
 |---|---|
@@ -15,7 +36,7 @@ Bu repository; kaynak kodu, kullanılan vaka dokümanını, tekrar üretilebilir
 | [`data/source/report.pdf`](data/source/report.pdf) | Pipeline'ın işlediği kaynak KAP raporudur. Doğrulanan SHA-256 değeri `25e4afe4c27bd2b3bb17a943a323e265520e68981c349f300d9248b3f3bfd7e0` şeklindedir. |
 | [`configs/default.json`](configs/default.json) | Özet sayfa aralığını, hedef dipnot numarasını, OCR ayarlarını, model ayarlarını, çıktı yollarını ve kalite kapılarını tanımlayan varsayılan çalışma yapılandırmasıdır. Sayfa 5–7 ve Dipnot 11 bilgileri iş mantığında değil bu dosyada tutulur. |
 
-### 1.2. Değerlendirme ve Karşılaştırma Raporları
+### 1.3. Değerlendirme ve Karşılaştırma Raporları
 
 | Dosya | İçerik ve kullanım amacı |
 |---|---|
@@ -27,7 +48,7 @@ Bu repository; kaynak kodu, kullanılan vaka dokümanını, tekrar üretilebilir
 
 Bu metrikler yalnızca sağlanan vaka üzerindeki iki insan kontrollü ilişkiye dayanır. Genel model başarısı veya istatistiksel olarak kalibre edilmiş performans iddiası olarak yorumlanmamalıdır.
 
-### 1.3. Kaynak Kod, Kurulum ve Testler
+### 1.4. Kaynak Kod, Kurulum ve Testler
 
 | Yol | İçerik ve kullanım amacı |
 |---|---|
@@ -60,7 +81,7 @@ Temel Python dosyaları aşağıdaki haritada özetlenmiştir. Her `.py` dosyas�
 | [`scripts/evaluate_relations.py`](scripts/evaluate_relations.py), [`scripts/compare_relation_methods.py`](scripts/compare_relation_methods.py) | Tahminleri ayrı insan kontrollü beklentilerle değerlendirir ve baseline–semantic sonuçlarını aynı sözleşmede karşılaştırır. |
 | [`scripts/benchmark_embedding_models.py`](scripts/benchmark_embedding_models.py), [`scripts/prepare_delivery_artifacts.py`](scripts/prepare_delivery_artifacts.py) | Embedding modellerini sabit aday kümesinde kıyaslar; doğrulanmış raporları sabit teslim yollarına taşıyıp kanıt indeksini üretir. |
 
-### 1.4. Mühendislik Kayıtları
+### 1.5. Mühendislik Kayıtları
 
 | Dosya | İçerik ve kullanım amacı |
 |---|---|
