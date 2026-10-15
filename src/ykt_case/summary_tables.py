@@ -12,6 +12,7 @@ from ykt_case.normalization import NumericStatus, parse_financial_number
 
 
 _YEAR_PATTERN = re.compile(r"^(?:19|20)\d{2}$")
+_OCR_REPAIR_CONFIDENCE_CEILING = 0.9
 
 
 @dataclass(frozen=True)
@@ -151,17 +152,243 @@ def _line_cell(line: _Line, role: str, page_number: int) -> dict[str, Any]:
     }
 
 
-def _period_values(row: dict[str, Any]) -> dict[str, int] | None:
-    values: dict[str, int] = {}
+def _period_values(
+    row: dict[str, Any], *, dash_as_zero: bool = False
+) -> dict[str, int | float] | None:
+    values: dict[str, int | float] = {}
     for cell in row.get("cells", []):
         if cell.get("role") != "data_cell":
             continue
         period = cell.get("period")
         value = cell.get("normalized_value")
-        if cell.get("numeric_status") != NumericStatus.VALUE.value or value is None:
+        status = cell.get("numeric_status")
+        if dash_as_zero and status == NumericStatus.DASH.value:
+            values[str(period)] = 0
+            continue
+        if status != NumericStatus.VALUE.value or value is None:
             return None
-        values[str(period)] = int(value)
+        values[str(period)] = value
     return values or None
+
+
+def _values_match(
+    left: dict[str, int | float], right: dict[str, int | float]
+) -> bool:
+    return set(left) == set(right) and all(
+        abs(float(left[period]) - float(right[period])) <= 1e-6
+        for period in left
+    )
+
+
+def _rows_reconcile(
+    target_row: dict[str, Any], candidate_rows: list[dict[str, Any]]
+) -> bool:
+    target = _period_values(target_row, dash_as_zero=True)
+    if target is None or not candidate_rows:
+        return False
+    candidate_values = [
+        _period_values(row, dash_as_zero=True) for row in candidate_rows
+    ]
+    if any(values is None or set(values) != set(target) for values in candidate_values):
+        return False
+    sums = {
+        period: sum(float(values[period]) for values in candidate_values if values)
+        for period in target
+    }
+    return _values_match(target, sums)
+
+
+def _separator_alternative(raw_text: str, label: str | None) -> int | None:
+    """Return a possible integer when OCR may have swapped '.' for ','."""
+
+    if label and "hisse başına" in label.casefold():
+        return None
+    text = raw_text.strip()
+    negative = text.startswith("(") and text.endswith(")")
+    if negative:
+        text = text[1:-1].strip()
+    if re.fullmatch(r"(?:0|[1-9]\d{0,2}(?:\.\d{3})*|[1-9]\d*),\d{3}", text) is None:
+        return None
+    alternative = int(text.replace(".", "").replace(",", ""))
+    return -alternative if negative else alternative
+
+
+def _resolve_child_separator_ambiguities(
+    parent: dict[str, Any], children: list[dict[str, Any]]
+) -> None:
+    """Resolve one separator ambiguity only when it uniquely restores a parent sum."""
+
+    target = _period_values(parent, dash_as_zero=True)
+    if target is None:
+        return
+    for period, target_value in target.items():
+        target_cell = next(
+            (
+                item
+                for item in parent.get("cells", [])
+                if item.get("role") == "data_cell"
+                and str(item.get("period")) == period
+            ),
+            None,
+        )
+        if target_cell is None or (
+            float(target_cell.get("confidence", 1.0))
+            < _OCR_REPAIR_CONFIDENCE_CEILING
+        ):
+            continue
+        cells: list[dict[str, Any]] = []
+        for child in children:
+            cell = next(
+                (
+                    item
+                    for item in child.get("cells", [])
+                    if item.get("role") == "data_cell"
+                    and str(item.get("period")) == period
+                ),
+                None,
+            )
+            if cell is None or cell.get("numeric_status") not in {
+                NumericStatus.VALUE.value,
+                NumericStatus.DASH.value,
+            }:
+                cells = []
+                break
+            cells.append(cell)
+        if not cells:
+            continue
+        primary_sum = sum(
+            0.0
+            if cell.get("numeric_status") == NumericStatus.DASH.value
+            else float(cell["normalized_value"])
+            for cell in cells
+        )
+        solutions: list[tuple[dict[str, Any], int | float]] = []
+        for cell in cells:
+            candidates = cell.get("normalization_candidates", [])
+            if len(candidates) < 2:
+                continue
+            primary = float(cell["normalized_value"])
+            for candidate in candidates:
+                if abs(float(candidate) - primary) <= 1e-9:
+                    continue
+                if abs(primary_sum - primary + float(candidate) - float(target_value)) <= 1e-6:
+                    solutions.append((cell, candidate))
+        if len(solutions) != 1:
+            continue
+        cell, selected = solutions[0]
+        original = cell["normalized_value"]
+        cell["parser_normalized_value"] = original
+        cell["normalized_value"] = selected
+        cell["normalization_resolution"] = {
+            "method": "parent_child_financial_reconciliation",
+            "parser_normalized_value": original,
+            "selected_normalized_value": selected,
+            "target_row_id": parent["row_id"],
+            "period": period,
+            "target_confidence": target_cell.get("confidence"),
+        }
+
+
+def _digit_edit_distance(left: int | float, right: int | float) -> int | None:
+    if not float(left).is_integer() or not float(right).is_integer():
+        return None
+    left_text = str(abs(int(left)))
+    right_text = str(abs(int(right)))
+    if len(left_text) != len(right_text):
+        return None
+    return sum(a != b for a, b in zip(left_text, right_text))
+
+
+def _resolve_child_digit_ambiguities(
+    parent: dict[str, Any], children: list[dict[str, Any]]
+) -> None:
+    """Repair one low-confidence digit only when the parent residual proves it."""
+
+    target = _period_values(parent, dash_as_zero=True)
+    if target is None:
+        return
+    for period, target_value in target.items():
+        target_cell = next(
+            (
+                cell
+                for cell in parent.get("cells", [])
+                if cell.get("role") == "data_cell"
+                and str(cell.get("period")) == period
+            ),
+            None,
+        )
+        if target_cell is None or (
+            float(target_cell.get("confidence", 1.0))
+            < _OCR_REPAIR_CONFIDENCE_CEILING
+        ):
+            continue
+        cells = [
+            next(
+                (
+                    cell
+                    for cell in child.get("cells", [])
+                    if cell.get("role") == "data_cell"
+                    and str(cell.get("period")) == period
+                ),
+                None,
+            )
+            for child in children
+        ]
+        if any(cell is None for cell in cells):
+            continue
+        usable = [
+            cell
+            for cell in cells
+            if cell is not None
+            and cell.get("numeric_status") in {
+                NumericStatus.VALUE.value,
+                NumericStatus.DASH.value,
+            }
+        ]
+        if len(usable) != len(cells):
+            continue
+        primary_sum = sum(
+            0.0
+            if cell.get("numeric_status") == NumericStatus.DASH.value
+            else float(cell["normalized_value"])
+            for cell in usable
+        )
+        if abs(primary_sum - float(target_value)) <= 1e-6:
+            continue
+        candidates: list[tuple[dict[str, Any], int]] = []
+        for cell in usable:
+            if cell.get("numeric_status") != NumericStatus.VALUE.value:
+                continue
+            current = cell.get("normalized_value")
+            if not isinstance(current, (int, float)):
+                continue
+            required = float(target_value) - (primary_sum - float(current))
+            if not required.is_integer():
+                continue
+            required_integer = int(required)
+            if _digit_edit_distance(current, required_integer) != 1:
+                continue
+            if float(cell.get("confidence", 1.0)) >= _OCR_REPAIR_CONFIDENCE_CEILING:
+                continue
+            candidates.append((cell, required_integer))
+        if len(candidates) != 1:
+            continue
+        cell, selected = candidates[0]
+        original = cell["normalized_value"]
+        cell["parser_normalized_value"] = original
+        cell["normalization_ambiguity"] = "single_digit_ocr_error"
+        cell["normalization_candidates"] = [original, selected]
+        cell["normalized_value"] = selected
+        cell["normalization_resolution"] = {
+            "method": "parent_child_residual_single_digit_reconciliation",
+            "parser_normalized_value": original,
+            "selected_normalized_value": selected,
+            "target_row_id": parent["row_id"],
+            "period": period,
+            "ocr_confidence": cell.get("confidence"),
+            "confidence_ceiling": _OCR_REPAIR_CONFIDENCE_CEILING,
+            "target_confidence": target_cell.get("confidence"),
+        }
 
 
 def _reconciled_preceding_rows(
@@ -169,7 +396,7 @@ def _reconciled_preceding_rows(
 ) -> list[str]:
     """Return the shortest exact contiguous suffix explaining a subtotal/total."""
 
-    target = _period_values(rows[total_index])
+    target = _period_values(rows[total_index], dash_as_zero=True)
     if target is None:
         return []
     candidates: list[dict[str, Any]] = []
@@ -177,16 +404,77 @@ def _reconciled_preceding_rows(
         candidate = rows[index]
         if candidate.get("row_type") == "section_header":
             break
-        values = _period_values(candidate)
+        values = _period_values(candidate, dash_as_zero=True)
         if values is None or set(values) != set(target):
             continue
         candidates.insert(0, candidate)
-        sums = {
-            period: sum(_period_values(item)[period] for item in candidates)
-            for period in target
-        }
-        if sums == target:
+        if _rows_reconcile(rows[total_index], candidates):
             return [str(item["row_id"]) for item in candidates]
+    return []
+
+
+def _set_aggregation(
+    row: dict[str, Any],
+    candidate_rows: list[dict[str, Any]],
+    basis: str,
+) -> None:
+    row["aggregation_of_row_ids"] = [str(item["row_id"]) for item in candidate_rows]
+    row["aggregation_status"] = "reconciled"
+    row["aggregation_basis"] = basis
+    for candidate in candidate_rows:
+        candidate.setdefault("aggregated_by_row_ids", []).append(row["row_id"])
+
+
+def _is_non_additive_row(row: dict[str, Any]) -> bool:
+    label = str(row.get("label") or "").casefold()
+    return "hisse başına" in label
+
+
+def _presentation_section_indexes(rows: list[dict[str, Any]]) -> set[int]:
+    """Identify distribution blocks that restate, rather than add to, a prior total."""
+
+    excluded: set[int] = set()
+    for start, row in enumerate(rows):
+        if row.get("row_type") != "section_header":
+            continue
+        for end in range(start + 1, len(rows)):
+            candidate = rows[end]
+            if candidate.get("row_type") == "section_header":
+                break
+            if candidate.get("label") is None and candidate.get("aggregation_status") == "reconciled":
+                excluded.update(range(start, end + 1))
+                break
+    return excluded
+
+
+def _preceding_frontier(
+    rows: list[dict[str, Any]], total_index: int
+) -> list[dict[str, Any]]:
+    target = rows[total_index]
+    target_level = int(target.get("hierarchy_level", 0))
+    excluded_indexes = _presentation_section_indexes(rows)
+    candidates = [
+        row
+        for index, row in enumerate(rows[:total_index])
+        if index not in excluded_indexes
+        and row.get("row_type") != "section_header"
+        and int(row.get("hierarchy_level", 0)) == target_level
+        and not _is_non_additive_row(row)
+    ]
+    candidate_ids = {str(row["row_id"]) for row in candidates}
+    candidates = [
+        row
+        for row in candidates
+        if not any(
+            aggregator in candidate_ids
+            for aggregator in row.get("aggregated_by_row_ids", [])
+        )
+    ]
+    suffix: list[dict[str, Any]] = []
+    for candidate in reversed(candidates):
+        suffix.insert(0, candidate)
+        if _rows_reconcile(target, suffix):
+            return suffix
     return []
 
 
@@ -195,6 +483,7 @@ def _assign_row_relationships(table_id: str, rows: list[dict[str, Any]]) -> None
 
     indentation_threshold = 18
     for index, row in enumerate(rows, start=1):
+        row["extracted_row_type"] = row["row_type"]
         row["row_id"] = f"{table_id}:row-{index}"
         row["parent_row_id"] = None
         row["child_row_ids"] = []
@@ -265,21 +554,76 @@ def _assign_row_relationships(table_id: str, rows: list[dict[str, Any]]) -> None
         if row["row_type"] == "detail" and row.get("label"):
             parent_stack.append(row)
 
+    for row in rows:
+        row["aggregation_of_row_ids"] = []
+        row["aggregation_status"] = (
+            "unresolved" if row["row_type"] in {"subtotal", "total"} else "not_applicable"
+        )
+        row["aggregation_basis"] = (
+            "no_exact_non_overlapping_reconciliation"
+            if row["aggregation_status"] == "unresolved"
+            else "not_applicable"
+        )
+        row["aggregated_by_row_ids"] = []
+
+    # Unlabeled distribution totals are intentionally parentless, so preserve
+    # their exact contiguous reconciliation before using hierarchy frontiers.
+    for index, row in enumerate(rows):
+        if row.get("label") is not None or row.get("row_type") != "total":
+            continue
+        candidate_ids = _reconciled_preceding_rows(rows, index)
+        candidates = [by_id[candidate_id] for candidate_id in candidate_ids]
+        if candidates:
+            _set_aggregation(row, candidates, "contiguous_unlabeled_total")
+
+    # Geometry-derived parents provide the safest subtotal boundary. A possible
+    # decimal/thousands OCR swap is resolved only if one alternative uniquely
+    # restores the exact parent sum in the affected period.
+    for row in rows:
+        children = [by_id[child_id] for child_id in row.get("child_row_ids", [])]
+        if not children:
+            continue
+        _resolve_child_separator_ambiguities(row, children)
+        _resolve_child_digit_ambiguities(row, children)
+        if _rows_reconcile(row, children):
+            if row["row_type"] == "detail":
+                row["row_type"] = "subtotal"
+            _set_aggregation(row, children, "direct_hierarchy_children")
+
+    # Some financial statements print a subtotal before its following
+    # components. Reconcile the same-level frontier until the next explicit
+    # subtotal/total/section boundary.
+    for index, row in enumerate(rows):
+        if row.get("aggregation_status") == "reconciled" or row.get("row_type") == "section_header":
+            continue
+        following: list[dict[str, Any]] = []
+        for candidate in rows[index + 1 :]:
+            if candidate.get("extracted_row_type") in {
+                "subtotal",
+                "total",
+                "section_header",
+            }:
+                break
+            if int(candidate.get("hierarchy_level", 0)) == int(row.get("hierarchy_level", 0)):
+                following.append(candidate)
+        if following and _rows_reconcile(row, following):
+            if row["row_type"] == "detail":
+                row["row_type"] = "subtotal"
+            _set_aggregation(row, following, "following_same_level_components")
+
+    # Remaining explicit totals are checked against a non-overlapping preceding
+    # frontier. Components already represented by a reconciled parent are
+    # excluded, preventing parent-plus-child double counting.
     for index, row in enumerate(rows):
         if row["row_type"] not in {"subtotal", "total"}:
-            row["aggregation_of_row_ids"] = []
-            row["aggregation_status"] = "not_applicable"
             continue
-        aggregation_ids = _reconciled_preceding_rows(rows, index)
-        row["aggregation_of_row_ids"] = aggregation_ids
-        row["aggregation_status"] = "reconciled" if aggregation_ids else "unresolved"
-        for child_id in aggregation_ids:
-            child = by_id[child_id]
-            if row["row_id"] not in child.setdefault("aggregated_by_row_ids", []):
-                child["aggregated_by_row_ids"].append(row["row_id"])
+        if row.get("aggregation_status") == "reconciled":
+            continue
+        candidates = _preceding_frontier(rows, index)
+        if candidates:
+            _set_aggregation(row, candidates, "preceding_non_overlapping_frontier")
 
     for row in rows:
-        row.setdefault("aggregated_by_row_ids", [])
         if row["row_type"] == "section_header":
             row["hierarchy_role"] = "section"
         elif row["row_type"] in {"subtotal", "total"}:
@@ -452,6 +796,26 @@ def extract_summary_page(page: dict[str, Any]) -> dict[str, Any]:
                 "confidence": _confidence(cell_tokens),
                 "source": _source(page_number, _bbox(cell_tokens), raw_text),
             }
+            separator_alternative = _separator_alternative(raw_text, label_text or None)
+            if (
+                parsed.status is NumericStatus.VALUE
+                and separator_alternative is not None
+                and separator_alternative != parsed.value
+            ):
+                cell["normalization_ambiguity"] = "decimal_or_thousands_separator"
+                cell["normalization_candidates"] = [
+                    parsed.value,
+                    separator_alternative,
+                ]
+                warnings.append(
+                    {
+                        "code": "ambiguous_decimal_or_thousands_separator",
+                        "financial_row_index": data_row_index + 1,
+                        "period": period,
+                        "raw_text": raw_text,
+                        "candidates": [parsed.value, separator_alternative],
+                    }
+                )
             cells.append(cell)
             if parsed.status is NumericStatus.INVALID:
                 warnings.append(
@@ -516,6 +880,23 @@ def extract_summary_page(page: dict[str, Any]) -> dict[str, Any]:
 
     table_id = f"summary-p{page_number}"
     _assign_row_relationships(table_id, rows)
+    for row in rows:
+        for cell in row.get("cells", []):
+            resolution = cell.get("normalization_resolution")
+            if not resolution:
+                continue
+            warnings.append(
+                {
+                    "code": "evidence_resolved_financial_value",
+                    "row_id": row["row_id"],
+                    "period": cell.get("period"),
+                    "raw_text": cell.get("raw_text"),
+                    "parser_normalized_value": cell.get("parser_normalized_value"),
+                    "selected_value": cell.get("normalized_value"),
+                    "method": resolution.get("method"),
+                    "target_row_id": resolution.get("target_row_id"),
+                }
+            )
 
     title_line = next(
         (line for line in lines if "KONSOLİDE" in line.text.upper()),

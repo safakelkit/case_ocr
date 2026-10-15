@@ -18,6 +18,230 @@ def token(text, left, top, width, line, confidence=0.95):
 
 
 class SummaryTableTests(unittest.TestCase):
+    @staticmethod
+    def _financial_cells(first, second, *, first_status="value", second_status="value"):
+        return [
+            {
+                "role": "data_cell",
+                "period": "2012",
+                "normalized_value": first,
+                "numeric_status": first_status,
+            },
+            {
+                "role": "data_cell",
+                "period": "2011",
+                "normalized_value": second,
+                "numeric_status": second_status,
+            },
+        ]
+
+    def test_separator_ambiguity_is_resolved_only_by_exact_parent_sum(self):
+        ambiguous = self._financial_cells(4.224, 4224)
+        ambiguous[0]["normalization_ambiguity"] = "decimal_or_thousands_separator"
+        ambiguous[0]["normalization_candidates"] = [4.224, 4224]
+        rows = [
+            {
+                "row_type": "detail",
+                "label": "Duran Varlıklar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(5000, 5000),
+            },
+            {
+                "row_type": "detail",
+                "label": "Finansal Yatırımlar",
+                "bbox": {"left": 130},
+                "cells": ambiguous,
+            },
+            {
+                "row_type": "detail",
+                "label": "Diğer",
+                "bbox": {"left": 130},
+                "cells": self._financial_cells(776, 776),
+            },
+        ]
+
+        _assign_row_relationships("summary-p9", rows)
+
+        corrected = rows[1]["cells"][0]
+        self.assertEqual(corrected["parser_normalized_value"], 4.224)
+        self.assertEqual(corrected["normalized_value"], 4224)
+        self.assertEqual(
+            corrected["normalization_resolution"]["method"],
+            "parent_child_financial_reconciliation",
+        )
+        self.assertEqual(rows[0]["aggregation_status"], "reconciled")
+        self.assertEqual(rows[0]["row_type"], "subtotal")
+
+    def test_single_low_confidence_digit_is_resolved_by_parent_residual(self):
+        damaged = self._financial_cells(71543097, 1083886)
+        damaged[0]["confidence"] = 0.82
+        other = self._financial_cells(57014632, 20297060)
+        other[0]["confidence"] = 0.96
+        rows = [
+            {
+                "row_type": "detail",
+                "label": "Dönen Varlıklar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(134557729, 21380946),
+            },
+            {
+                "row_type": "detail",
+                "label": "Stoklar",
+                "bbox": {"left": 130},
+                "cells": damaged,
+            },
+            {
+                "row_type": "detail",
+                "label": "Diğer Kalemler",
+                "bbox": {"left": 130},
+                "cells": other,
+            },
+        ]
+
+        _assign_row_relationships("summary-p9", rows)
+
+        corrected = rows[1]["cells"][0]
+        self.assertEqual(corrected["parser_normalized_value"], 71543097)
+        self.assertEqual(corrected["normalized_value"], 77543097)
+        self.assertEqual(
+            corrected["normalization_resolution"]["method"],
+            "parent_child_residual_single_digit_reconciliation",
+        )
+        self.assertEqual(rows[0]["aggregation_status"], "reconciled")
+
+    def test_dash_is_zero_only_for_reconciliation(self):
+        rows = [
+            {
+                "row_type": "subtotal",
+                "label": "Faaliyet Karı",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(100, 200),
+            },
+            {
+                "row_type": "detail",
+                "label": "Pay",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(10, None, second_status="dash"),
+            },
+            {
+                "row_type": "detail",
+                "label": "Gelir",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(20, 30),
+            },
+            {
+                "row_type": "detail",
+                "label": "Gider",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(-5, -10),
+            },
+            {
+                "row_type": "subtotal",
+                "label": "Vergi Öncesi Kar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(125, 220),
+            },
+        ]
+
+        _assign_row_relationships("summary-p9", rows)
+
+        self.assertEqual(rows[1]["cells"][1]["numeric_status"], "dash")
+        self.assertIsNone(rows[1]["cells"][1]["normalized_value"])
+        self.assertEqual(rows[4]["aggregation_status"], "reconciled")
+        self.assertEqual(
+            rows[4]["aggregation_of_row_ids"],
+            [row["row_id"] for row in rows[:4]],
+        )
+
+    def test_hierarchy_frontier_avoids_parent_child_double_counting(self):
+        rows = [
+            {
+                "row_type": "subtotal",
+                "label": "Vergi Öncesi Kar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(100, 200),
+            },
+            {
+                "row_type": "detail",
+                "label": "Vergi Gelir Gideri",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(-10, -20),
+            },
+            {
+                "row_type": "detail",
+                "label": "Cari Vergi",
+                "bbox": {"left": 130},
+                "cells": self._financial_cells(-7, -12),
+            },
+            {
+                "row_type": "detail",
+                "label": "Ertelenmiş Vergi",
+                "bbox": {"left": 130},
+                "cells": self._financial_cells(-3, -8),
+            },
+            {
+                "row_type": "subtotal",
+                "label": "Dönem Karı",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(90, 180),
+            },
+        ]
+
+        _assign_row_relationships("summary-p9", rows)
+
+        self.assertEqual(rows[1]["aggregation_status"], "reconciled")
+        self.assertEqual(
+            rows[1]["aggregation_of_row_ids"],
+            [rows[2]["row_id"], rows[3]["row_id"]],
+        )
+        self.assertEqual(rows[4]["aggregation_status"], "reconciled")
+        self.assertEqual(
+            rows[4]["aggregation_of_row_ids"],
+            [rows[0]["row_id"], rows[1]["row_id"]],
+        )
+
+    def test_prefix_subtotal_reconciles_following_same_level_components(self):
+        rows = [
+            {
+                "row_type": "subtotal",
+                "label": "Özkaynaklar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(100, 200),
+            },
+            {
+                "row_type": "detail",
+                "label": "Ana Ortaklık",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(60, 120),
+            },
+            {
+                "row_type": "detail",
+                "label": "Ana Ortaklık Alt Kalemi",
+                "bbox": {"left": 130},
+                "cells": self._financial_cells(60, 120),
+            },
+            {
+                "row_type": "detail",
+                "label": "Kontrol Gücü Olmayan Paylar",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(40, 80),
+            },
+            {
+                "row_type": "total",
+                "label": "Toplam",
+                "bbox": {"left": 100},
+                "cells": self._financial_cells(110, 210),
+            },
+        ]
+
+        _assign_row_relationships("summary-p9", rows)
+
+        self.assertEqual(rows[0]["aggregation_status"], "reconciled")
+        self.assertEqual(
+            rows[0]["aggregation_of_row_ids"],
+            [rows[1]["row_id"], rows[3]["row_id"]],
+        )
+
     def test_detects_dynamic_period_columns_and_arbitrary_note_reference(self):
         page = {
             "pdf_page_number": 9,

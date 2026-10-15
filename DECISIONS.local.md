@@ -233,3 +233,13 @@ Use this file for material decisions. Promote submission-relevant decisions and 
 - Decision: keep both the semantic model identifier and its exact Hugging Face revision in runtime configuration, require a non-empty revision for custom models, and pass the configured revision through FastEmbed to the snapshot download layer.
 - Rationale: recording the revision after inference proves what was cached on one machine but does not prevent a clean environment from downloading a later repository state. Runtime enforcement is required for reproducible inference.
 - Consequence: clean and cached runs resolve the selected MiniLM model at `faf4aa4225822f3bc6376869cb1164e8e3feedd0`; the requested and resolved revision remain visible in model metadata and the run manifest.
+
+---
+
+## D-028 — Resolve OCR numeric ambiguity only with unique financial evidence
+
+- Status: accepted
+- Date: 2026-10-15
+- Decision: preserve raw OCR and the parser's initial normalized value, and select a different numeric value only when exactly one separator alternative or one low-confidence single-digit alternative restores an exact parent-child reconciliation. Keep the ambiguity and resolution on the cell, mark it for review, and validate the provenance. During reconciliation only, treat a dash as zero contribution without changing its stored `dash` status. Reconcile totals over a non-overlapping hierarchy frontier so an aggregate and its children are never counted together.
+- Rationale: locale-aware decimal support is necessary, but OCR can replace a thousands dot with a comma; contiguous-row addition also fails on prefix totals, dashes, and nested rows. A unique exact accounting identity is stronger evidence than silently trusting either OCR punctuation or one local parse, while additive provenance prevents the correction from becoming invisible.
+- Consequence: the supplied report exposes three attributable evidence-resolved cells and all 20 emitted summary subtotals/totals reconcile. If evidence is absent or multiple corrections are possible, no value is selected and the ambiguity remains unresolved.

@@ -183,6 +183,10 @@ def _annotate_extraction_review(
                     cell_flags.append("low_confidence")
                 if cell.get("numeric_status") == "invalid":
                     cell_flags.append("invalid_numeric_value")
+                if cell.get("normalization_ambiguity"):
+                    cell_flags.append("ambiguous_numeric_separator")
+                if cell.get("normalization_resolution"):
+                    cell_flags.append("evidence_resolved_normalization")
                 if (
                     cell.get("bbox") is None
                     and cell.get("numeric_status") not in {"blank", None}

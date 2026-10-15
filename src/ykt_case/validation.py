@@ -351,12 +351,122 @@ def _balance_sheet_check(summary_output: dict[str, Any] | None) -> dict[str, Any
     )
 
 
+def _summary_aggregation_check(
+    summary_output: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if summary_output is None:
+        return _result(
+            "summary_aggregation_reconciliation",
+            "financial",
+            "not_applicable",
+            "Summary-table aggregation evidence was not supplied.",
+        )
+    aggregate_rows = [
+        row
+        for table in summary_output.get("tables", [])
+        for row in table.get("rows", [])
+        if row.get("row_type") in {"subtotal", "total"}
+    ]
+    unresolved = [
+        str(row.get("row_id"))
+        for row in aggregate_rows
+        if row.get("aggregation_status") != "reconciled"
+    ]
+    reconciled = [
+        {
+            "row_id": row.get("row_id"),
+            "basis": row.get("aggregation_basis"),
+            "contributors": row.get("aggregation_of_row_ids", []),
+        }
+        for row in aggregate_rows
+        if row.get("aggregation_status") == "reconciled"
+    ]
+    status = "passed" if aggregate_rows and not unresolved else "incomplete"
+    return _result(
+        "summary_aggregation_reconciliation",
+        "financial",
+        status,
+        "Every emitted summary subtotal and total should carry exact, non-overlapping reconciliation evidence.",
+        {
+            "aggregate_row_count": len(aggregate_rows),
+            "reconciled_rows": reconciled,
+            "unresolved_row_ids": unresolved,
+        },
+    )
+
+
+def _summary_normalization_provenance_check(
+    summary_output: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if summary_output is None:
+        return _result(
+            "summary_normalization_provenance",
+            "financial",
+            "not_applicable",
+            "Summary-table normalization evidence was not supplied.",
+        )
+    ambiguous_cells = [
+        (row, cell)
+        for table in summary_output.get("tables", [])
+        for row in table.get("rows", [])
+        for cell in row.get("cells", [])
+        if cell.get("normalization_ambiguity")
+    ]
+    unresolved = []
+    malformed = []
+    corrections = []
+    for row, cell in ambiguous_cells:
+        resolution = cell.get("normalization_resolution")
+        identity = {
+            "row_id": row.get("row_id"),
+            "period": cell.get("period"),
+            "raw_text": cell.get("raw_text"),
+        }
+        if not isinstance(resolution, dict):
+            unresolved.append(identity)
+            continue
+        required = {
+            "method",
+            "parser_normalized_value",
+            "selected_normalized_value",
+        }
+        if not required.issubset(resolution):
+            malformed.append({**identity, "resolution": resolution})
+            continue
+        corrections.append(
+            {
+                **identity,
+                "parser_normalized_value": resolution["parser_normalized_value"],
+                "selected_normalized_value": resolution["selected_normalized_value"],
+                "method": resolution["method"],
+                "target_row_id": resolution.get("target_row_id"),
+            }
+        )
+    status = "failed" if malformed else "incomplete" if unresolved else "passed"
+    return _result(
+        "summary_normalization_provenance",
+        "financial",
+        status,
+        "Ambiguous OCR normalizations must remain reviewable and any selected correction must have exact financial evidence.",
+        {
+            "ambiguous_cell_count": len(ambiguous_cells),
+            "evidence_resolved_corrections": corrections,
+            "unresolved_cells": unresolved,
+            "malformed_resolutions": malformed,
+        },
+    )
+
+
 def validate_financial(
     note_output: dict[str, Any],
     relation_output: dict[str, Any],
     summary_output: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
-    checks: list[dict[str, Any]] = [_balance_sheet_check(summary_output)]
+    checks: list[dict[str, Any]] = [
+        _balance_sheet_check(summary_output),
+        _summary_aggregation_check(summary_output),
+        _summary_normalization_provenance_check(summary_output),
+    ]
     applicable = 0
     for table in _all_note_tables(note_output):
         rows = table.get("rows", [])

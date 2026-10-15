@@ -25,7 +25,7 @@ Acceptance criteria:
 - [x] Initialize Git when explicitly agreed.
 - [x] Create Python package structure and dependency configuration.
 - [x] Add a single documented CLI entry point.
-- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 66 tests pass after the normal-wheel fix and current regression additions.
+- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 73 tests pass after the normal-wheel fix and current regression additions.
 - [x] Separate local run commands and engineering error records from the final README.
 - [x] Add logging, deterministic seed handling, and run metadata.
 - [x] Add source/config checksums and a reproducible run manifest.
@@ -62,6 +62,7 @@ Acceptance criteria:
 - [x] Infer evidence-based section, parent, child, and total relationships; leave financially unreconciled aggregations explicit as unresolved.
 - [x] Classify visually unlabeled distribution totals only from exact period-wise reconciliation and keep them parentless.
 - [x] Recover complete multiline statement titles without injecting expected title text.
+- [x] Reconcile prefix subtotals, dash-as-zero contributions, and nested aggregates without double-counting parent and child rows.
 - [x] Emit table-, row-, and cell-level confidence.
 
 Acceptance criteria:
@@ -74,6 +75,7 @@ Acceptance criteria:
 - [x] Implement locale-aware numeric parsing.
 - [x] Distinguish dash, blank, zero, invalid OCR, and numeric value.
 - [x] Parse parenthesized values as negative.
+- [x] Detect decimal/thousands and low-confidence single-digit OCR ambiguities; retain the parser result and select a correction only when one exact parent-child reconciliation proves it.
 - [~] Add exhaustive unit tests for numeric edge cases.
 - [x] Preserve period and currency metadata.
 
@@ -130,6 +132,7 @@ Acceptance criteria:
 - [x] Add formatting validations.
 - [x] Add within-table and cross-table financial validations.
 - [x] Add period-wise balance-sheet equality validation for total assets versus total liabilities and equity.
+- [x] Validate that every emitted summary subtotal/total is reconciled and every evidence-selected numeric correction retains complete provenance.
 - [x] Treat agreement between two empty selected sets as absence of relation evidence rather than perfect agreement.
 - [x] Propagate standalone validation failure through a non-zero CLI exit code.
 - [x] Record validation evidence, incomplete checks, failures, and actions in output.

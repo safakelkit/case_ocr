@@ -242,6 +242,73 @@ class ValidationTests(unittest.TestCase):
         )
         self.assertEqual(balance["status"], "passed")
 
+    def test_unresolved_summary_aggregation_is_incomplete(self):
+        summary_output = {
+            "tables": [
+                {
+                    "rows": [
+                        {
+                            "row_id": "summary-p5:row-18",
+                            "row_type": "total",
+                            "aggregation_status": "unresolved",
+                        }
+                    ]
+                }
+            ]
+        }
+        checks = validate_financial({"notes": []}, {"relations": []}, summary_output)
+        aggregation = next(
+            item
+            for item in checks
+            if item["check_id"] == "summary_aggregation_reconciliation"
+        )
+        self.assertEqual(aggregation["status"], "incomplete")
+        self.assertEqual(
+            aggregation["evidence"]["unresolved_row_ids"],
+            ["summary-p5:row-18"],
+        )
+
+    def test_evidence_resolved_normalization_keeps_parser_provenance(self):
+        summary_output = {
+            "tables": [
+                {
+                    "rows": [
+                        {
+                            "row_id": "summary-p5:row-13",
+                            "cells": [
+                                {
+                                    "period": "2012",
+                                    "raw_text": "4,224",
+                                    "normalized_value": 4224,
+                                    "normalization_ambiguity": (
+                                        "decimal_or_thousands_separator"
+                                    ),
+                                    "normalization_resolution": {
+                                        "method": (
+                                            "parent_child_financial_reconciliation"
+                                        ),
+                                        "parser_normalized_value": 4.224,
+                                        "selected_normalized_value": 4224,
+                                        "target_row_id": "summary-p5:row-10",
+                                    },
+                                }
+                            ],
+                        }
+                    ]
+                }
+            ]
+        }
+        checks = validate_financial({"notes": []}, {"relations": []}, summary_output)
+        provenance = next(
+            item
+            for item in checks
+            if item["check_id"] == "summary_normalization_provenance"
+        )
+        self.assertEqual(provenance["status"], "passed")
+        correction = provenance["evidence"]["evidence_resolved_corrections"][0]
+        self.assertEqual(correction["parser_normalized_value"], 4.224)
+        self.assertEqual(correction["selected_normalized_value"], 4224)
+
 
 if __name__ == "__main__":
     unittest.main()

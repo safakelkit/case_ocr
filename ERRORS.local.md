@@ -286,3 +286,33 @@ This file permanently records engineering failures observed on the real document
 - **Resolution:** A period-wise check finds both source totals, records their difference, and returns `incomplete` rather than guessing when evidence is missing.
 - **Regression evidence:** A unit test covers the equation. In the latest run, both sides equal `781.408.277` for 2011 and `852.149.804` for 2012, with difference `0`.
 - **Status:** Resolved.
+
+## E032 — A thousands separator OCR error was accepted as a decimal without review
+
+- **Stage:** Summary-value normalization
+- **Expected result:** Page-5 `Finansal Yatırımlar` for 2012 should represent financial integer `4.224` (`4224`) and remain auditable.
+- **Actual result:** OCR emitted `4,224`; the locale parser validly interpreted it as decimal `4.224`, and the cell was not marked for review.
+- **Root cause:** Decimal-comma support is required for legitimate values such as earnings per share, but no secondary accounting check distinguished that case from an OCR-swapped thousands separator.
+- **Resolution:** Potential comma-plus-three-digit ambiguity is retained with both candidates. The integer candidate is selected only when it is the unique value that restores the exact parent-child total. Raw OCR, parser value, selected value, method, target row and period are all emitted; the cell remains review-required.
+- **Regression evidence:** Unit tests cover unique separator resolution and provenance validation. The real page-5 result retains raw `4,224`, parser value `4.224`, selected value `4224`, and method `parent_child_financial_reconciliation`.
+- **Status:** Resolved with attributable evidence.
+
+## E033 — Summary total reconciliation failed on prefix, dash and nested structures
+
+- **Stage:** Summary hierarchy and financial validation
+- **Expected result:** Exact statement subtotals and totals should list non-overlapping contributors for both periods.
+- **Actual result:** Page 5 and 6 had no resolved totals, while three page-7 totals remained unresolved even though manual arithmetic was exact.
+- **Root cause:** Reconciliation searched only a contiguous suffix above a total, skipped dash cells instead of treating them as zero contribution, could not use components printed below a prefix subtotal, and could count an aggregate together with its children.
+- **Resolution:** The hierarchy now supports direct-child reconciliation, following same-level components for prefix totals, and a preceding non-overlapping frontier. A dash contributes zero only to arithmetic and remains `numeric_status: dash`. Represented child rows are excluded when their reconciled parent is already in the frontier.
+- **Regression evidence:** Tests cover all three failure modes. On the real report all 20 emitted summary subtotals/totals reconcile: page 5 `4/4`, page 6 `7/7`, page 7 `9/9`; validation emits `summary_aggregation_reconciliation: passed`.
+- **Status:** Resolved.
+
+## E034 — Exact parent reconciliation exposed two additional low-confidence digit errors
+
+- **Stage:** Summary OCR normalization
+- **Expected result:** `Stoklar` 2012 and `Dönem Karı Vergi Yükümlülüğü` 2011 should agree with their visible source values and parent totals.
+- **Actual result:** OCR produced `71.543.097` and `716.915`; the source values are `77.543.097` and `776.915`.
+- **Root cause:** One digit in each cell was misrecognized at low OCR confidence (`0.827459` and `0.815274`).
+- **Resolution:** A one-digit alternative may be selected only when the source cell is below the documented confidence ceiling, one and only one cell can explain the residual, and the replacement restores the exact parent sum. Raw OCR and parser values are never overwritten.
+- **Regression evidence:** A unit test covers the single-candidate rule. The final validation lists both corrections under `summary_normalization_provenance`; both cells are review-required.
+- **Status:** Resolved with attributable evidence.
