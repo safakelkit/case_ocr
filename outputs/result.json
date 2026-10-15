@@ -1191,7 +1191,7 @@
                 "target_confidence": 0.957716
               },
               "quality_flags": [
-                "ambiguous_numeric_separator",
+                "ambiguous_ocr_digit",
                 "evidence_resolved_normalization"
               ],
               "review_required": true
@@ -4209,7 +4209,7 @@
                 "target_confidence": 0.958139
               },
               "quality_flags": [
-                "ambiguous_numeric_separator",
+                "ambiguous_ocr_digit",
                 "evidence_resolved_normalization"
               ],
               "review_required": true

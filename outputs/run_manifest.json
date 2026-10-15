@@ -1,9 +1,9 @@
 {
   "schema_version": "1.0",
-  "run_id": "20261015T103501012542Z",
+  "run_id": "20261015T103845257591Z",
   "status": "completed_with_warnings",
-  "started_at": "2026-10-15T10:35:01.012449+00:00",
-  "finished_at": "2026-10-15T10:37:09.428687+00:00",
+  "started_at": "2026-10-15T10:38:45.257502+00:00",
+  "finished_at": "2026-10-15T10:40:53.017233+00:00",
   "random_seed": 0,
   "determinism": "No stochastic runtime algorithm is used; seed is recorded for future-compatible stages.",
   "source": {
@@ -32,7 +32,7 @@
     }
   },
   "git": {
-    "commit": "7479234021f47352be12978ced44f62f8ffea96c",
+    "commit": "6959368b9fa96787d3125c9f8689146deee6fb77",
     "dirty": false
   },
   "event_log": "outputs/run_events.jsonl",
@@ -40,63 +40,63 @@
     {
       "stage": "summary_ocr",
       "status": "completed",
-      "started_at": "2026-10-15T10:35:01.076493+00:00",
-      "finished_at": "2026-10-15T10:35:07.518923+00:00",
-      "duration_seconds": 6.441055,
+      "started_at": "2026-10-15T10:38:45.361077+00:00",
+      "finished_at": "2026-10-15T10:38:51.862936+00:00",
+      "duration_seconds": 6.500479,
       "output": "work/ocr/summary_ocr.json",
       "output_sha256": "7f470164ee5f78a7aed5c97a86fce46f5cebc55059695af9494f06e13c015f3e"
     },
     {
       "stage": "summary_structure",
       "status": "completed_with_warnings",
-      "started_at": "2026-10-15T10:35:07.519853+00:00",
-      "finished_at": "2026-10-15T10:35:07.530543+00:00",
-      "duration_seconds": 0.009341,
+      "started_at": "2026-10-15T10:38:51.863984+00:00",
+      "finished_at": "2026-10-15T10:38:51.874652+00:00",
+      "duration_seconds": 0.00931,
       "output": "work/structured/summary_tables.json",
       "output_sha256": "6157365fdfeebcc21cced636a5ba0583fbd8c0e7c2582ecb445b333c9b9bd479"
     },
     {
       "stage": "note_location",
       "status": "completed",
-      "started_at": "2026-10-15T10:35:07.531191+00:00",
-      "finished_at": "2026-10-15T10:37:00.708963+00:00",
-      "duration_seconds": 113.178714,
+      "started_at": "2026-10-15T10:38:51.875278+00:00",
+      "finished_at": "2026-10-15T10:40:45.275613+00:00",
+      "duration_seconds": 113.40123,
       "output": "work/notes/note_locations.json",
       "output_sha256": "0dd1c0fbe5f4d60d9d343b3323fb4ff5c0abdf7f094184b2e15b746f3373d830"
     },
     {
       "stage": "note_extraction",
       "status": "completed_with_warnings",
-      "started_at": "2026-10-15T10:37:00.710692+00:00",
-      "finished_at": "2026-10-15T10:37:07.875325+00:00",
-      "duration_seconds": 7.164284,
+      "started_at": "2026-10-15T10:40:45.276822+00:00",
+      "finished_at": "2026-10-15T10:40:51.632710+00:00",
+      "duration_seconds": 6.355531,
       "output": "work/structured/note_tables.json",
       "output_sha256": "4099751a05d1f74573b539d27c9af12de6b2ee983c6e1ecc7a52a33ead31bdeb"
     },
     {
       "stage": "relation_matching_baseline",
       "status": "completed",
-      "started_at": "2026-10-15T10:37:07.876124+00:00",
-      "finished_at": "2026-10-15T10:37:07.881325+00:00",
-      "duration_seconds": 0.00505,
+      "started_at": "2026-10-15T10:40:51.633885+00:00",
+      "finished_at": "2026-10-15T10:40:51.639528+00:00",
+      "duration_seconds": 0.005485,
       "output": "work/matching/baseline_relations.json",
       "output_sha256": "33217913a0877c6b5db972029a715f4f7e31c6393ee8ffc00c19685b49290b7c"
     },
     {
       "stage": "relation_matching_semantic",
       "status": "completed",
-      "started_at": "2026-10-15T10:37:07.881785+00:00",
-      "finished_at": "2026-10-15T10:37:09.395913+00:00",
-      "duration_seconds": 1.513852,
+      "started_at": "2026-10-15T10:40:51.640086+00:00",
+      "finished_at": "2026-10-15T10:40:52.986130+00:00",
+      "duration_seconds": 1.345762,
       "output": "work/matching/semantic_relations.json",
       "output_sha256": "01edd1ab348deb6f45f3ef465a39a579bee32fff061ef67a4c721a5bb4346b7d"
     },
     {
       "stage": "confidence_and_validation",
       "status": "completed_with_warnings",
-      "started_at": "2026-10-15T10:37:09.396831+00:00",
-      "finished_at": "2026-10-15T10:37:09.412865+00:00",
-      "duration_seconds": 0.01585,
+      "started_at": "2026-10-15T10:40:52.987018+00:00",
+      "finished_at": "2026-10-15T10:40:53.000826+00:00",
+      "duration_seconds": 0.013637,
       "output": "work/validation/validation_report.json",
       "output_sha256": "c13461890dea72ef790eea983648010a772b65e97909117d0988e63b100aabd6"
     }
@@ -287,7 +287,7 @@
   "error": null,
   "final_output": {
     "path": "outputs/result.json",
-    "sha256": "9555b1d88e7b450dd16fe7b3e861c76144484006e48861c60f0501441ada180c",
+    "sha256": "637c12c1b3fe37acefc3f4c461b94590fdab929b196d2866e23f047f37dd5ffa",
     "status": "completed_with_warnings"
   }
 }
