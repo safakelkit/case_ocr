@@ -171,6 +171,7 @@ Acceptance criteria:
 - [x] Document models, inputs, context, chunking, inference settings, thresholds, and fallback in README Sections 4 and 8.
 - [x] Promote verified implementation, runbook, evaluation, limitation, reproducibility, and future-work notes into the final Turkish README.
 - [x] For every model-using stage, document its task, selection rationale, exact runtime/model revision where applicable, input construction, inference context, chunking, candidate generation/ranking, threshold, settings, and failure fallback.
+- [x] Consolidate the semantic model's runtime, input, candidate, scoring, threshold, cache, and fallback settings in one compact README inference table.
 - [x] Document the confidence methodology, penalties, review markers, validation behavior, and verified final-run status in README Section 4.
 - [x] Document method/model comparison and at least three submission-facing error or low-confidence examples in README Sections 8 and 9.
 - [x] Test dependency installation, unit tests, full pipeline, evaluations, and delivery packaging from a deleted/recreated environment.

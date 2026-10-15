@@ -183,6 +183,7 @@ The OCR and both required matching approaches have been measured for the current
 - README Section 4 now includes a concrete summary-to-note relation evidence diagram and a compact table of five representative quality gates with configured thresholds, final observations, and actions; full gate evidence remains linked to config, result, and manifest.
 - README Section 1 now includes a 15-row source-code map covering the core runtime and evaluation scripts. Every Python file carries a short Turkish purpose comment; executable scripts keep the shebang first and place that comment immediately below it.
 - README begins with a macOS quick-start block that clones the repository, installs system and pinned Python dependencies into a clean `.venv`, runs the test suite, and executes the seven-stage pipeline; detailed checks remain in Section 5 and `RUNBOOK.local.md`.
+- README Section 4.8 consolidates all semantic inference settings in one table, including the FastEmbed/model revision, ONNX CPU runtime, four threads, default batch handling, cache/download policy, input exclusions, 38-candidate space, cosine/hybrid scoring, Top-5 threshold, numeric selection rule, and named baseline fallback.
 - Reproducible installation and execution commands live in `RUNBOOK.local.md` until final delivery.
 - Observed failures, root causes, fixes, and regression evidence live in `ERRORS.local.md`.
 - Only verified and still-current information will be promoted from these files into the final README.

@@ -198,6 +198,28 @@ Semantic yaklaşım aynı 38 adayı ve aynı sayısal/yapısal seçim sözleşme
 
 Varsayılan model, CPU üzerinde FastEmbed/ONNX ile çalışan `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` modelidir. Model girdisi satır etiketleri, satır türleri, dipnot numarası, dönemler ve sütun başlıklarından oluşur; finansal değerler embedding metnine eklenmez ve ayrı kanıt olarak değerlendirilir. Model yüklenemez veya inference başarısız olursa baseline sonucu fallback olarak kullanılabilir; tetikleyici hata, kaybedilen semantic kanıt ve fallback sonucu manifestte açıkça kaydedilir.
 
+| Inference ayarı | Kullanılan değer veya politika |
+|---|---|
+| Provider ve sürüm | FastEmbed `0.9.0` |
+| Model | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
+| Çözülmüş model kaynağı | `Qdrant/paraphrase-multilingual-MiniLM-L12-v2-onnx-Q` |
+| Model revision | `faf4aa4225822f3bc6376869cb1164e8e3feedd0` |
+| Runtime ve cihaz | ONNX Runtime, CPU |
+| Embedding boyutu | `384` |
+| CPU thread sayısı | `4` |
+| Batch ayarı | Kod tarafından override edilmez; FastEmbed varsayılanı kullanılır. |
+| Cache ve indirme | `work/models/fastembed`; ilk çalışmada indirme açık, cache oluştuktan sonra çevrimdışı kullanım desteklenir. |
+| Embedding girdisi | Özet ve dipnot satırları için benzersiz kısa metin bağlamları; etiket, satır türü, dipnot numarası, dönem ve sütun başlıkları. |
+| Girdiden hariç tutulanlar | Finansal değerler ve insan kontrollü beklenen cevaplar; sayılar ayrı kanıt olarak skorlanır. |
+| Aday uzayı | `2` özet satırı × `19` dipnot satırı = `38` aday ilişki |
+| Benzerlik | Cosine similarity; `[0, 1]` aralığına sınırlandırılır. |
+| Hibrit skor | `0,50` sayısal kapsam + `0,25` semantic benzerlik + `0,10` yapısal uyum + `0,15` çıkarım kalitesi |
+| Sıralama ve eşik | En fazla `5` aday; minimum aday skoru `0,35` |
+| Seçim kuralı | Exact dönemsel sayısal kapsam zorunludur; embedding skoru tek başına ilişki seçemez. |
+| Hata davranışı | Model yükleme/inference hatası kaydedilir ve adlandırılmış lexical–sayısal–yapısal baseline fallback'i çalışabilir. |
+
+Çalışmaya ait kesin model metadatası [`outputs/run_manifest.json`](outputs/run_manifest.json) → `models`, karar ayarları ve girdi politikası ise [`outputs/result.json`](outputs/result.json) → `matching.selected_method` altında makine tarafından okunabilir biçimde saklanır.
+
 ### 4.9. Güven Skorları ve Doğrulama
 
 Tablo, satır ve hücre güvenleri; OCR güveni, geometrik tutarlılık, alanların bulunabilirliği, ayrıştırma başarısı ve finansal kontroller gibi ilgili kanıtlardan üretilir. Nihai ilişki güveni ise aşağıdaki birleşimdir:
