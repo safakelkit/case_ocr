@@ -12769,6 +12769,7 @@
         "provider": "fastembed",
         "provider_version": "0.9.0",
         "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        "configured_revision": "faf4aa4225822f3bc6376869cb1164e8e3feedd0",
         "runtime": "onnxruntime_cpu",
         "embedding_dimension": 384,
         "license": "apache-2.0",
