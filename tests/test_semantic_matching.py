@@ -1,7 +1,11 @@
 # Bu dosya, embedding bağlamı, anlamsal sıralama, model kaydı ve açık fallback davranışını test etmek için kullanılır.
+import sys
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 from ykt_case.semantic_matching import (
+    FastEmbedTextEncoder,
     build_note_context,
     build_summary_context,
     match_relations_semantic,
@@ -28,6 +32,42 @@ class FakeEncoder:
 
 
 class SemanticMatchingTests(unittest.TestCase):
+    def test_fastembed_receives_configured_revision(self):
+        captured = {}
+
+        class FakeTextEmbedding:
+            @staticmethod
+            def list_supported_models():
+                return [
+                    {
+                        "model": "example/model",
+                        "dim": 2,
+                        "license": "test",
+                        "sources": {"hf": "example/model-onnx"},
+                    }
+                ]
+
+            def __init__(self, **kwargs):
+                captured.update(kwargs)
+
+            def embed(self, texts):
+                return ([1.0, 0.0] for _ in texts)
+
+        fake_module = SimpleNamespace(TextEmbedding=FakeTextEmbedding)
+        with patch.dict(sys.modules, {"fastembed": fake_module}):
+            encoder = FastEmbedTextEncoder(
+                model_name="example/model",
+                model_revision="revision-123",
+                cache_dir="unused-cache",
+                threads=2,
+                allow_download=False,
+            )
+
+        self.assertEqual(captured["revision"], "revision-123")
+        self.assertTrue(captured["local_files_only"])
+        self.assertEqual(encoder.metadata()["configured_revision"], "revision-123")
+        self.assertEqual(encoder.metadata()["source_revision"], "revision-123")
+
     def test_semantic_signal_reranks_same_value_candidates(self):
         summary_output = {
             "tables": [

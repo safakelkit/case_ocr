@@ -9,6 +9,14 @@ from pathlib import Path
 from typing import Any
 
 
+DEFAULT_SEMANTIC_MODEL = (
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+)
+DEFAULT_SEMANTIC_MODEL_REVISION = (
+    "faf4aa4225822f3bc6376869cb1164e8e3feedd0"
+)
+
+
 @dataclass(frozen=True)
 class PageRange:
     """Inclusive, one-based PDF page range."""
@@ -60,6 +68,7 @@ class PipelineConfig:
     matching_top_k: int
     matching_minimum_candidate_score: float
     semantic_model_name: str
+    semantic_model_revision: str
     semantic_cache_dir: Path
     semantic_threads: int
     semantic_allow_download: bool
@@ -95,6 +104,8 @@ class PipelineConfig:
             raise ValueError("matching minimum candidate score must be in [0, 1]")
         if not self.semantic_model_name.strip():
             raise ValueError("semantic model name cannot be empty")
+        if not self.semantic_model_revision.strip():
+            raise ValueError("semantic model revision cannot be empty")
         if self.semantic_threads < 1:
             raise ValueError("semantic threads must be positive")
         names = [gate.name for gate in self.quality_gates]
@@ -134,6 +145,16 @@ def load_config(path: str | Path) -> PipelineConfig:
     if not isinstance(notes, list) or not all(isinstance(note, int) for note in notes):
         raise ValueError("target_notes must be a list of integers")
 
+    semantic_model_name = str(
+        semantic_data.get("model_name", DEFAULT_SEMANTIC_MODEL)
+    )
+    revision_value = semantic_data.get("model_revision")
+    semantic_model_revision = (
+        DEFAULT_SEMANTIC_MODEL_REVISION
+        if revision_value is None and semantic_model_name == DEFAULT_SEMANTIC_MODEL
+        else str(revision_value or "")
+    )
+
     return PipelineConfig(
         source_pdf=Path(raw["source_pdf"]),
         summary_pages=PageRange(start=page_data["start"], end=page_data["end"]),
@@ -158,12 +179,8 @@ def load_config(path: str | Path) -> PipelineConfig:
         matching_minimum_candidate_score=float(
             matching_data.get("minimum_candidate_score", 0.35)
         ),
-        semantic_model_name=str(
-            semantic_data.get(
-                "model_name",
-                "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-            )
-        ),
+        semantic_model_name=semantic_model_name,
+        semantic_model_revision=semantic_model_revision,
         semantic_cache_dir=Path(
             semantic_data.get("cache_dir", "work/models/fastembed")
         ),

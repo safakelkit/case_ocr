@@ -323,6 +323,7 @@ def run_semantic_matching(config: PipelineConfig) -> Path:
         progress_message("Embedding modeli yükleniyor ve adaylar kodlanıyor...")
         encoder = FastEmbedTextEncoder(
             model_name=config.semantic_model_name,
+            model_revision=config.semantic_model_revision,
             cache_dir=str(config.semantic_cache_dir),
             threads=config.semantic_threads,
             allow_download=config.semantic_allow_download,

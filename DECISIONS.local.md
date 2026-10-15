@@ -223,3 +223,13 @@ Use this file for material decisions. Promote submission-relevant decisions and 
 - Decision: share explicit percentage statuses between extraction and validation, require bounded percentage evidence, assign zero method-agreement evidence when both matchers abstain, add balance-sheet equality validation, and make standalone validation failures return a non-zero process status.
 - Rationale: producer/consumer schema drift and optimistic empty-set scoring can create false confidence; automation must also be able to distinguish a failed validation from success.
 - Consequence: damaged percentage OCR is preserved as invalid rather than repaired from expectations, confidence better reflects evidence absence, balance integrity is visible per period, and CI/shell callers receive actionable failure status.
+
+---
+
+## D-027 — Enforce the selected embedding revision at model load time
+
+- Status: accepted
+- Date: 2026-10-15
+- Decision: keep both the semantic model identifier and its exact Hugging Face revision in runtime configuration, require a non-empty revision for custom models, and pass the configured revision through FastEmbed to the snapshot download layer.
+- Rationale: recording the revision after inference proves what was cached on one machine but does not prevent a clean environment from downloading a later repository state. Runtime enforcement is required for reproducible inference.
+- Consequence: clean and cached runs resolve the selected MiniLM model at `faf4aa4225822f3bc6376869cb1164e8e3feedd0`; the requested and resolved revision remain visible in model metadata and the run manifest.

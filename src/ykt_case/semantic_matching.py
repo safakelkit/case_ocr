@@ -38,6 +38,7 @@ class FastEmbedTextEncoder:
     def __init__(
         self,
         model_name: str,
+        model_revision: str | None,
         cache_dir: str,
         threads: int,
         allow_download: bool,
@@ -62,6 +63,7 @@ class FastEmbedTextEncoder:
                 cache_dir=cache_dir,
                 threads=threads,
                 local_files_only=not allow_download,
+                **({"revision": model_revision} if model_revision else {}),
             )
         except SemanticModelError:
             raise
@@ -70,6 +72,7 @@ class FastEmbedTextEncoder:
                 f"semantic model could not be loaded: {type(exc).__name__}: {exc}"
             ) from exc
         self._model_name = model_name
+        self._model_revision = model_revision
         self._cache_dir = cache_dir
         self._threads = threads
         self._allow_download = allow_download
@@ -85,7 +88,7 @@ class FastEmbedTextEncoder:
 
     def metadata(self) -> dict[str, Any]:
         source_repository = self._description.get("sources", {}).get("hf")
-        source_revision = None
+        source_revision = self._model_revision
         if source_repository:
             snapshot_root = (
                 Path(self._cache_dir)
@@ -95,12 +98,13 @@ class FastEmbedTextEncoder:
             snapshots = sorted(
                 path.name for path in snapshot_root.glob("*") if path.is_dir()
             )
-            if len(snapshots) == 1:
+            if source_revision is None and len(snapshots) == 1:
                 source_revision = snapshots[0]
         return {
             "provider": "fastembed",
             "provider_version": version("fastembed"),
             "model_name": self._model_name,
+            "configured_revision": self._model_revision,
             "runtime": "onnxruntime_cpu",
             "embedding_dimension": self._description.get("dim"),
             "license": self._description.get("license"),

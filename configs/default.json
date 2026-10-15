@@ -28,6 +28,7 @@
   },
   "semantic": {
     "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "model_revision": "faf4aa4225822f3bc6376869cb1164e8e3feedd0",
     "cache_dir": "work/models/fastembed",
     "threads": 4,
     "allow_download": true

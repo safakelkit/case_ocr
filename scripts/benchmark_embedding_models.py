@@ -90,6 +90,11 @@ def main() -> None:
         try:
             encoder = FastEmbedTextEncoder(
                 model_name=model_name,
+                model_revision=(
+                    config.semantic_model_revision
+                    if model_name == config.semantic_model_name
+                    else None
+                ),
                 cache_dir=str(config.semantic_cache_dir),
                 threads=config.semantic_threads,
                 allow_download=args.allow_download,

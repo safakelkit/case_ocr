@@ -46,11 +46,35 @@ class ConfigTests(unittest.TestCase):
             config.semantic_model_name,
             "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         )
+        self.assertEqual(
+            config.semantic_model_revision,
+            "faf4aa4225822f3bc6376869cb1164e8e3feedd0",
+        )
         self.assertEqual(config.semantic_threads, 4)
         self.assertTrue(config.semantic_allow_download)
         self.assertEqual(config.quality_gates[0].name, "period_header_coverage")
         self.assertEqual(config.quality_gates[0].action, "stop")
         self.assertEqual(config.random_seed, 0)
+
+    def test_custom_semantic_model_requires_explicit_revision(self) -> None:
+        path = self._write_config(
+            {
+                "source_pdf": "report.pdf",
+                "summary_pages": {"start": 5, "end": 7},
+                "target_notes": [11],
+                "output_path": "result.json",
+                "ocr": {},
+                "semantic": {"model_name": "example/custom-model"},
+                "quality_gates": {
+                    "test": {
+                        "threshold": 1.0,
+                        "rationale": "test gate",
+                    }
+                },
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "semantic model revision"):
+            load_config(path)
 
     def test_rejects_zero_based_user_page(self) -> None:
         path = self._write_config(

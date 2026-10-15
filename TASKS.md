@@ -25,7 +25,7 @@ Acceptance criteria:
 - [x] Initialize Git when explicitly agreed.
 - [x] Create Python package structure and dependency configuration.
 - [x] Add a single documented CLI entry point.
-- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 64 tests pass after the normal-wheel fix and current regression additions.
+- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 66 tests pass after the normal-wheel fix and current regression additions.
 - [x] Separate local run commands and engineering error records from the final README.
 - [x] Add logging, deterministic seed handling, and run metadata.
 - [x] Add source/config checksums and a reproducible run manifest.
@@ -157,6 +157,7 @@ Acceptance criteria:
 - [x] Publish stable result, manifest, event-log, evaluation, and requirement-evidence paths under `outputs/`.
 - [x] Add an explicit summary-table column schema and uniform table/row/cell/relation review markers.
 - [x] Pin the verified Python environment in `requirements.txt`.
+- [x] Pin the semantic model identifier and exact Hugging Face revision in runtime configuration and enforce both during model loading.
 - [x] Include the source PDF at `data/source/report.pdf` for a self-contained reproducible submission.
 - [x] Add a concise Turkish purpose comment to every Python source, script, and test file.
 - [x] Add measured terminal progress for pipeline stages and page-based OCR, with a `--no-progress` opt-out.

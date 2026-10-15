@@ -54,7 +54,7 @@ Bu metrikler yalnızca sağlanan vaka üzerindeki iki insan kontrollü ilişkiye
 |---|---|
 | [`src/ykt_case/`](src/ykt_case/) | Rendering, OCR, tablo çıkarımı, normalizasyon, dipnot bulma, aday üretimi, iki eşleştirme yaklaşımı, güven birleştirme, validasyon ve orchestration kodudur. |
 | [`scripts/`](scripts/) | PSM karşılaştırması, ilişki değerlendirmesi, yöntem karşılaştırması, embedding benchmarkı ve teslim artefaktı hazırlama komutlarını içerir. |
-| [`tests/`](tests/) | Normalizasyon, yapılandırma, sayfa/dipnot bulma, tablo çıkarımı, matching, fallback, güven, validasyon, orchestration ve teslim paketleme davranışlarını kapsayan 64 otomatik testtir. |
+| [`tests/`](tests/) | Normalizasyon, yapılandırma, sayfa/dipnot bulma, tablo çıkarımı, matching, fallback, güven, validasyon, orchestration ve teslim paketleme davranışlarını kapsayan 66 otomatik testtir. |
 | [`requirements.txt`](requirements.txt) | Temiz ortamda doğrulanan doğrudan ve geçişli Python bağımlılıklarının sabit sürümlerini ve normal yerel wheel kurulumunu içerir. |
 | [`pyproject.toml`](pyproject.toml) | Paket metadatasını, `ykt-case` terminal komutunu, doğrudan bağımlılıkları ve sabit build backend sürümünü tanımlar. |
 | [`evaluation/`](evaluation/) | Runtime tahminlerinden ayrı tutulan insan kontrollü ilişki beklentilerini ve OCR kontrol örneklerini içerir; bu dosyalar pipeline'a cevap olarak enjekte edilmez. |
@@ -203,7 +203,7 @@ Varsayılan model, CPU üzerinde FastEmbed/ONNX ile çalışan `sentence-transfo
 | Provider ve sürüm | FastEmbed `0.9.0` |
 | Model | `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` |
 | Çözülmüş model kaynağı | `Qdrant/paraphrase-multilingual-MiniLM-L12-v2-onnx-Q` |
-| Model revision | `faf4aa4225822f3bc6376869cb1164e8e3feedd0` |
+| Model revision | `faf4aa4225822f3bc6376869cb1164e8e3feedd0`; konfigürasyondan indirme katmanına zorunlu parametre olarak aktarılır. |
 | Runtime ve cihaz | ONNX Runtime, CPU |
 | Embedding boyutu | `384` |
 | CPU thread sayısı | `4` |
