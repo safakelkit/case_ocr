@@ -7,7 +7,11 @@ import unittest
 from unittest.mock import patch
 
 from ykt_case.config import load_config
-from ykt_case.orchestration import build_final_output, sha256_file
+from ykt_case.orchestration import (
+    _annotate_extraction_review,
+    build_final_output,
+    sha256_file,
+)
 
 
 class OrchestrationTests(unittest.TestCase):
@@ -43,6 +47,42 @@ class OrchestrationTests(unittest.TestCase):
         self.assertEqual(
             sha256_file(self.source), hashlib.sha256(b"scanned report").hexdigest()
         )
+
+    def test_review_flags_distinguish_separator_and_digit_ambiguity(self) -> None:
+        tables = [
+            {
+                "confidence": 1.0,
+                "warnings": [],
+                "rows": [
+                    {
+                        "label": "Test",
+                        "row_type": "detail",
+                        "confidence": 1.0,
+                        "aggregation_status": "not_applicable",
+                        "cells": [
+                            {
+                                "confidence": 1.0,
+                                "normalization_ambiguity": "single_digit_ocr_error",
+                                "normalization_resolution": {"method": "test"},
+                            },
+                            {
+                                "confidence": 1.0,
+                                "normalization_ambiguity": (
+                                    "decimal_or_thousands_separator"
+                                ),
+                            },
+                        ],
+                    }
+                ],
+            }
+        ]
+
+        _annotate_extraction_review(tables, confidence_threshold=0.8)
+
+        digit, separator = tables[0]["rows"][0]["cells"]
+        self.assertIn("ambiguous_ocr_digit", digit["quality_flags"])
+        self.assertNotIn("ambiguous_numeric_separator", digit["quality_flags"])
+        self.assertIn("ambiguous_numeric_separator", separator["quality_flags"])
 
     def test_final_output_uses_predictions_not_evaluation_labels(self) -> None:
         relation = {

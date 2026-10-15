@@ -25,7 +25,7 @@ Acceptance criteria:
 - [x] Initialize Git when explicitly agreed.
 - [x] Create Python package structure and dependency configuration.
 - [x] Add a single documented CLI entry point.
-- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 73 tests pass after the normal-wheel fix and current regression additions.
+- [x] Verify the installed `ykt-case` console entry point without `PYTHONPATH`; help, config smoke test, direct package import, dependency check, and 74 tests pass after the normal-wheel fix and current regression additions.
 - [x] Separate local run commands and engineering error records from the final README.
 - [x] Add logging, deterministic seed handling, and run metadata.
 - [x] Add source/config checksums and a reproducible run manifest.

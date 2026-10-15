@@ -54,7 +54,7 @@ Bu metrikler yalnızca sağlanan vaka üzerindeki iki insan kontrollü ilişkiye
 |---|---|
 | [`src/ykt_case/`](src/ykt_case/) | Rendering, OCR, tablo çıkarımı, normalizasyon, dipnot bulma, aday üretimi, iki eşleştirme yaklaşımı, güven birleştirme, validasyon ve orchestration kodudur. |
 | [`scripts/`](scripts/) | PSM karşılaştırması, ilişki değerlendirmesi, yöntem karşılaştırması, embedding benchmarkı ve teslim artefaktı hazırlama komutlarını içerir. |
-| [`tests/`](tests/) | Normalizasyon, yapılandırma, sayfa/dipnot bulma, tablo çıkarımı, matching, fallback, güven, validasyon, orchestration ve teslim paketleme davranışlarını kapsayan 73 otomatik testtir. |
+| [`tests/`](tests/) | Normalizasyon, yapılandırma, sayfa/dipnot bulma, tablo çıkarımı, matching, fallback, güven, validasyon, orchestration ve teslim paketleme davranışlarını kapsayan 74 otomatik testtir. |
 | [`requirements.txt`](requirements.txt) | Temiz ortamda doğrulanan doğrudan ve geçişli Python bağımlılıklarının sabit sürümlerini ve normal yerel wheel kurulumunu içerir. |
 | [`pyproject.toml`](pyproject.toml) | Paket metadatasını, `ykt-case` terminal komutunu, doğrudan bağımlılıkları ve sabit build backend sürümünü tanımlar. |
 | [`evaluation/`](evaluation/) | Runtime tahminlerinden ayrı tutulan insan kontrollü ilişki beklentilerini ve OCR kontrol örneklerini içerir; bu dosyalar pipeline'a cevap olarak enjekte edilmez. |
@@ -402,7 +402,7 @@ Her uçtan uca çalışma benzersiz bir `run_id` ile izlenir. [`outputs/run_mani
 | Kalite ve fallback | Kalite kapılarının ölçüm/eşik/aksiyonları, validasyon özeti ve varsa fallback olayları |
 | Nihai artefakt | `outputs/result.json` yolu, çalışma durumu ve SHA-256 değeri |
 
-Son doğrulanmış çalışma `20261015T101700717026Z` kimliğiyle `completed_with_warnings` durumunda tamamlanmıştır. Kaynak PDF SHA-256 değeri `25e4afe4c27bd2b3bb17a943a323e265520e68981c349f300d9248b3f3bfd7e0`, yapılandırma SHA-256 değeri `068c68321145e44fb7294b49db133e674b5b4c0c8f16a8127cbac8ef4b2cd739` ve nihai JSON SHA-256 değeri `03404e950100fb600750ead5b7a305fb29478bdf300443d43ca66a9c22df6ae4` olarak manifestte kayıtlıdır. Manifest ayrıca çalışmanın `4abe22c4ded10356f99a346718ead59e05c6424d` Git revizyonundan ve çalışma başlangıcında temiz bir çalışma ağacından üretildiğini gösterir. Çalışmada rastgele seçim kullanılmaz; seed gelecekte eklenecek olası stochastic aşamalar için yine de kaydedilir.
+Son doğrulanmış çalışma `20261015T103501012542Z` kimliğiyle yaklaşık `128,42` saniyede `completed_with_warnings` durumunda tamamlanmıştır. Kaynak PDF SHA-256 değeri `25e4afe4c27bd2b3bb17a943a323e265520e68981c349f300d9248b3f3bfd7e0`, yapılandırma SHA-256 değeri `068c68321145e44fb7294b49db133e674b5b4c0c8f16a8127cbac8ef4b2cd739` ve nihai JSON SHA-256 değeri `9555b1d88e7b450dd16fe7b3e861c76144484006e48861c60f0501441ada180c` olarak manifestte kayıtlıdır. Manifest ayrıca çalışmanın `7479234021f47352be12978ced44f62f8ffea96c` Git revizyonundan ve çalışma başlangıcında temiz bir çalışma ağacından üretildiğini gösterir. Çalışmada rastgele seçim kullanılmaz; seed gelecekte eklenecek olası stochastic aşamalar için yine de kaydedilir.
 
 [`outputs/delivery_index.json`](outputs/delivery_index.json), sabit teslim artefaktlarının yol, boyut ve SHA-256 değerlerini ayrıca listeler. Bu checksum'lar dosyaların sonradan değişip değişmediğini doğrular; finansal doğruluğun kanıtı ise validasyon kontrolleri ve kaynak provenance alanlarıdır.
 
