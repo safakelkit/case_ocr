@@ -1,0 +1,28 @@
+# Local Codex state
+.codex/
+
+# Local scratch/debug artifacts
+work/
+outputs/debug/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/

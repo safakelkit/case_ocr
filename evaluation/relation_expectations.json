@@ -1,0 +1,27 @@
+{
+  "description": "Human-reviewed relation expectations. Evaluation-only: never load this file in runtime matching.",
+  "examples": [
+    {
+      "summary_row_id": "summary-p5:row-13",
+      "summary_label": "Yatırım Amaçlı Gayrimenkuller",
+      "note_number": 11,
+      "acceptable_note_row_ids": [
+        "note-11-p53-t1:row-5",
+        "note-11-p53-t1:row-6",
+        "note-11-p53-t2:row-5",
+        "note-11-p54-t2:row-5"
+      ],
+      "comment": "The same closing values appear in multiple balance/net-book-value contexts; evaluation must not force one unique row."
+    },
+    {
+      "summary_row_id": "summary-p7:row-6",
+      "summary_label": "Yatırım Amaçlı Gayrimenkul Değerleme Farkları",
+      "note_number": 11,
+      "required_note_row_ids": [
+        "note-11-p53-t1:row-3",
+        "note-11-p53-t2:row-4"
+      ],
+      "comment": "The 2012 and 2011 summary values are supported by separate gain rows, requiring a one-to-many relation."
+    }
+  ]
+}

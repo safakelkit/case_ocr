@@ -1,0 +1,110 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Case kapsamı ile teslim artefaktları arasındaki sabit kanıt indeksi.",
+  "runtime_artifacts": {
+    "final_result": "outputs/result.json",
+    "run_manifest": "outputs/run_manifest.json",
+    "event_log": "outputs/run_events.jsonl"
+  },
+  "evaluation_artifacts": {
+    "baseline_metrics": "outputs/evaluation/baseline_relation_evaluation.json",
+    "semantic_metrics": "outputs/evaluation/semantic_relation_evaluation.json",
+    "method_comparison": "outputs/evaluation/relation_method_comparison.json",
+    "embedding_benchmark": "outputs/evaluation/embedding_model_benchmark.json",
+    "ocr_psm_comparison": "outputs/evaluation/psm_comparison.json"
+  },
+  "artifact_inventory": [
+    {
+      "path": "outputs/result.json",
+      "size_bytes": 437381,
+      "sha256": "7f572ae099336bc98d7c286a55b197af691406500ffbd319c84eacbfe6e544c5"
+    },
+    {
+      "path": "outputs/run_manifest.json",
+      "size_bytes": 10193,
+      "sha256": "7ecbc971a0042ce014538bf9a18f2b80a2a887a9ad08cd7af621c7e771e5ced0"
+    },
+    {
+      "path": "outputs/run_events.jsonl",
+      "size_bytes": 3720,
+      "sha256": "d71d03814925f4083847b9105ac3098d5419b005006a62a6f399ae4865b8446e"
+    },
+    {
+      "path": "outputs/evaluation/baseline_relation_evaluation.json",
+      "size_bytes": 1757,
+      "sha256": "f018a992f0351e122b49ae4380c5fff5a8f92e26ba6d118178f80ad79fe17d1e"
+    },
+    {
+      "path": "outputs/evaluation/semantic_relation_evaluation.json",
+      "size_bytes": 1763,
+      "sha256": "95c7d5da2dcd5e1ad6f05b951d818cc7b63a990dfacf3cc09cae1215af8bf0fe"
+    },
+    {
+      "path": "outputs/evaluation/relation_method_comparison.json",
+      "size_bytes": 2736,
+      "sha256": "90fb0a3afb1e4a6a2605cc16c2307910371cfbde795ffdf6f32c399e80ece788"
+    },
+    {
+      "path": "outputs/evaluation/embedding_model_benchmark.json",
+      "size_bytes": 14022,
+      "sha256": "b4276755b4d3ba735cf920233d5acf5592b150a73184654b122d536faf4bbe14"
+    },
+    {
+      "path": "outputs/evaluation/psm_comparison.json",
+      "size_bytes": 12092,
+      "sha256": "02fd8dd60d086561bb15c5669ce3a30e9638b21e3df7e50fa2e3481ff25b5f87"
+    }
+  ],
+  "requirement_evidence": [
+    {
+      "requirement": "Özet finansal tablolar, başlıklar, satırlar ve sütunlar",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/summary_tables"
+    },
+    {
+      "requirement": "Şirket, dönem ve para birimi metadatası ile kaynak kanıtı",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/document"
+    },
+    {
+      "requirement": "Ham ve normalize hücre değerleri; tire, boş ve sıfır ayrımı",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/summary_tables/*/rows/*/cells"
+    },
+    {
+      "requirement": "Ana, alt, bölüm, ara toplam ve toplam ilişkileri",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/summary_tables/*/rows"
+    },
+    {
+      "requirement": "Yapılandırılan dipnotun otomatik konumu ve tabloları",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/notes"
+    },
+    {
+      "requirement": "Özet satırı ile dipnot satırı ilişkileri",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/matching/relations"
+    },
+    {
+      "requirement": "Tablo, satır, hücre ve ilişki güvenleri ile inceleme bayrakları",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/review_policy"
+    },
+    {
+      "requirement": "Kalite kapıları ve yapısal, biçimsel, finansal doğrulamalar",
+      "artifact": "outputs/result.json",
+      "json_pointer": "/validation"
+    },
+    {
+      "requirement": "İki ilişki eşleme yaklaşımının örnek bazlı karşılaştırması",
+      "artifact": "outputs/evaluation/relation_method_comparison.json",
+      "json_pointer": "/examples"
+    },
+    {
+      "requirement": "Model, bağımlılık, checksum, aşama ve fallback çalışma kaydı",
+      "artifact": "outputs/run_manifest.json",
+      "json_pointer": "/"
+    }
+  ]
+}

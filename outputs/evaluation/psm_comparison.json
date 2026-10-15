@@ -1,0 +1,437 @@
+{
+  "purpose": "evaluation_only",
+  "config": "configs/default.json",
+  "expectations": "evaluation/psm_expectations.json",
+  "compared_psm_modes": [
+    3,
+    4,
+    6,
+    11
+  ],
+  "render_source": "existing_images",
+  "recommended_psm": 3,
+  "selection_order": [
+    "expected_token_hits",
+    "complete_target_rows",
+    "clean_target_rows",
+    "mean_confidence"
+  ],
+  "modes": [
+    {
+      "psm": 3,
+      "pages": [
+        {
+          "token_count": 146,
+          "mean_confidence": 0.949616,
+          "p10_confidence": 0.921169,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 11.0,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": true
+          },
+          "pdf_page_number": 5,
+          "image_path": "work/rendered/summary/summary-page-05.png"
+        },
+        {
+          "token_count": 213,
+          "mean_confidence": 0.943378,
+          "p10_confidence": 0.922263,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true,
+            "TOPLAM": true,
+            "KAYNAKLAR": true,
+            "852.149.804": true,
+            "781.408.277": true
+          },
+          "expected_hit_count": 6,
+          "expected_token_count": 6,
+          "pdf_page_number": 6,
+          "image_path": "work/rendered/summary/summary-page-06.png"
+        },
+        {
+          "token_count": 236,
+          "mean_confidence": 0.942237,
+          "p10_confidence": 0.921682,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 8.5,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": true
+          },
+          "pdf_page_number": 7,
+          "image_path": "work/rendered/summary/summary-page-07.png"
+        }
+      ],
+      "aggregate": {
+        "expected_found": 10,
+        "expected_total": 10,
+        "complete_target_rows": 2,
+        "target_row_count": 2,
+        "clean_target_rows": 2,
+        "mean_confidence": 0.945077
+      }
+    },
+    {
+      "psm": 4,
+      "pages": [
+        {
+          "token_count": 147,
+          "mean_confidence": 0.942924,
+          "p10_confidence": 0.909345,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              null,
+              "373.992.222",
+              "423.580.000"
+            ],
+            "all_found": false,
+            "y_spread_px": null,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": false
+          },
+          "pdf_page_number": 5,
+          "image_path": "work/rendered/summary/summary-page-05.png"
+        },
+        {
+          "token_count": 215,
+          "mean_confidence": 0.936862,
+          "p10_confidence": 0.913179,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true,
+            "TOPLAM": true,
+            "KAYNAKLAR": true,
+            "852.149.804": true,
+            "781.408.277": true
+          },
+          "expected_hit_count": 6,
+          "expected_token_count": 6,
+          "pdf_page_number": 6,
+          "image_path": "work/rendered/summary/summary-page-06.png"
+        },
+        {
+          "token_count": 236,
+          "mean_confidence": 0.939355,
+          "p10_confidence": 0.916233,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 8.5,
+            "all_tokens_same_tesseract_line": true,
+            "numeric_cells_same_tesseract_line": true
+          },
+          "pdf_page_number": 7,
+          "image_path": "work/rendered/summary/summary-page-07.png"
+        }
+      ],
+      "aggregate": {
+        "expected_found": 10,
+        "expected_total": 10,
+        "complete_target_rows": 1,
+        "target_row_count": 2,
+        "clean_target_rows": 1,
+        "mean_confidence": 0.939714
+      }
+    },
+    {
+      "psm": 6,
+      "pages": [
+        {
+          "token_count": 148,
+          "mean_confidence": 0.939201,
+          "p10_confidence": 0.911616,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              null,
+              "373.992.222",
+              "423.580.000"
+            ],
+            "all_found": false,
+            "y_spread_px": null,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": false
+          },
+          "pdf_page_number": 5,
+          "image_path": "work/rendered/summary/summary-page-05.png"
+        },
+        {
+          "token_count": 216,
+          "mean_confidence": 0.930943,
+          "p10_confidence": 0.913978,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true,
+            "TOPLAM": true,
+            "KAYNAKLAR": true,
+            "852.149.804": true,
+            "781.408.277": true
+          },
+          "expected_hit_count": 6,
+          "expected_token_count": 6,
+          "pdf_page_number": 6,
+          "image_path": "work/rendered/summary/summary-page-06.png"
+        },
+        {
+          "token_count": 237,
+          "mean_confidence": 0.937999,
+          "p10_confidence": 0.914863,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 8.5,
+            "all_tokens_same_tesseract_line": true,
+            "numeric_cells_same_tesseract_line": true
+          },
+          "pdf_page_number": 7,
+          "image_path": "work/rendered/summary/summary-page-07.png"
+        }
+      ],
+      "aggregate": {
+        "expected_found": 10,
+        "expected_total": 10,
+        "complete_target_rows": 1,
+        "target_row_count": 2,
+        "clean_target_rows": 1,
+        "mean_confidence": 0.936048
+      }
+    },
+    {
+      "psm": 11,
+      "pages": [
+        {
+          "token_count": 141,
+          "mean_confidence": 0.946463,
+          "p10_confidence": 0.92041,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkuller",
+              "11",
+              "373.992.222",
+              "423.580.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 11.0,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": false
+          },
+          "pdf_page_number": 5,
+          "image_path": "work/rendered/summary/summary-page-05.png"
+        },
+        {
+          "token_count": 208,
+          "mean_confidence": 0.941566,
+          "p10_confidence": 0.912826,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true,
+            "TOPLAM": true,
+            "KAYNAKLAR": true,
+            "852.149.804": true,
+            "781.408.277": true
+          },
+          "expected_hit_count": 6,
+          "expected_token_count": 6,
+          "pdf_page_number": 6,
+          "image_path": "work/rendered/summary/summary-page-06.png"
+        },
+        {
+          "token_count": 232,
+          "mean_confidence": 0.943433,
+          "p10_confidence": 0.920187,
+          "expected_token_hits": {
+            "2012": true,
+            "2011": true
+          },
+          "expected_hit_count": 2,
+          "expected_token_count": 2,
+          "target_row": {
+            "expected": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "found": [
+              "Yatırım",
+              "Amaçlı",
+              "Gayrimenkul",
+              "Değerleme",
+              "Farkları",
+              "11",
+              "3.896.434",
+              "151.350.000"
+            ],
+            "all_found": true,
+            "y_spread_px": 8.5,
+            "all_tokens_same_tesseract_line": false,
+            "numeric_cells_same_tesseract_line": false
+          },
+          "pdf_page_number": 7,
+          "image_path": "work/rendered/summary/summary-page-07.png"
+        }
+      ],
+      "aggregate": {
+        "expected_found": 10,
+        "expected_total": 10,
+        "complete_target_rows": 2,
+        "target_row_count": 2,
+        "clean_target_rows": 0,
+        "mean_confidence": 0.943821
+      }
+    }
+  ]
+}

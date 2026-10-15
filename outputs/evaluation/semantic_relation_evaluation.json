@@ -1,0 +1,65 @@
+{
+  "stage": "relation_evaluation",
+  "status": "completed",
+  "method": "multilingual_embedding_numeric_structural",
+  "sample_size": 2,
+  "metrics": {
+    "selected_set_accuracy": 1.0,
+    "top1_accuracy": 1.0,
+    "mean_recall_at_k": 1.0,
+    "mrr": 1.0
+  },
+  "examples": [
+    {
+      "summary_row_id": "summary-p5:row-13",
+      "found": true,
+      "selected_set_correct": true,
+      "top1_hit": true,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "selected_note_row_ids": [
+        "note-11-p54-t2:row-5"
+      ],
+      "relevant_note_row_ids": [
+        "note-11-p53-t1:row-5",
+        "note-11-p53-t1:row-6",
+        "note-11-p53-t2:row-5",
+        "note-11-p54-t2:row-5"
+      ],
+      "ranked_note_row_ids": [
+        "note-11-p54-t2:row-5",
+        "note-11-p53-t1:row-6",
+        "note-11-p53-t1:row-5",
+        "note-11-p53-t2:row-5",
+        "note-11-p53-t1:row-1"
+      ]
+    },
+    {
+      "summary_row_id": "summary-p7:row-6",
+      "found": true,
+      "selected_set_correct": true,
+      "top1_hit": true,
+      "recall_at_k": 1.0,
+      "reciprocal_rank": 1.0,
+      "selected_note_row_ids": [
+        "note-11-p53-t1:row-3",
+        "note-11-p53-t2:row-4"
+      ],
+      "relevant_note_row_ids": [
+        "note-11-p53-t1:row-3",
+        "note-11-p53-t2:row-4"
+      ],
+      "ranked_note_row_ids": [
+        "note-11-p53-t1:row-3",
+        "note-11-p53-t2:row-4",
+        "note-11-p54-t2:row-1",
+        "note-11-p53-t1:row-2",
+        "note-11-p54-t2:row-2"
+      ]
+    }
+  ],
+  "limitations": [
+    "Metrics are exploratory because the control set contains only the supplied case relationships.",
+    "Acceptable alternatives are counted as relevant where repeated financial values make a unique row indefensible."
+  ]
+}

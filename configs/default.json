@@ -1,0 +1,127 @@
+{
+  "source_pdf": "data/source/report.pdf",
+  "summary_pages": {
+    "start": 5,
+    "end": 7
+  },
+  "target_notes": [11],
+  "output_path": "outputs/result.json",
+  "work_dir": "work",
+  "random_seed": 0,
+  "render_dpi": 300,
+  "ocr": {
+    "engine": "tesseract",
+    "language": "tur+eng",
+    "page_segmentation_mode": 3
+  },
+  "note_search": {
+    "render_dpi": 110,
+    "page_segmentation_mode": 6
+  },
+  "note_extraction": {
+    "render_dpi": 300,
+    "page_segmentation_mode": 3
+  },
+  "matching": {
+    "top_k": 5,
+    "minimum_candidate_score": 0.35
+  },
+  "semantic": {
+    "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "cache_dir": "work/models/fastembed",
+    "threads": 4,
+    "allow_download": true
+  },
+  "quality_gates": {
+    "summary_ocr_mean_confidence": {
+      "threshold": 0.9,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "A page-level mean below 0.90 warrants review, while structural checks decide whether extraction must stop."
+    },
+    "summary_ocr_p10_confidence": {
+      "threshold": 0.8,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "The lower-confidence tail is monitored independently so a high mean cannot hide weak tokens."
+    },
+    "period_header_coverage": {
+      "threshold": 1.0,
+      "comparator": "gte",
+      "action": "stop",
+      "rationale": "Every configured summary table must expose all reporting periods before financial cells can be interpreted safely."
+    },
+    "summary_row_label_assignment_rate": {
+      "threshold": 0.9,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "At least 90 percent of financial rows should retain labels; unlabeled values remain inspectable rather than guessed."
+    },
+    "summary_period_cell_assignment_rate": {
+      "threshold": 0.98,
+      "comparator": "gte",
+      "action": "stop",
+      "rationale": "Period-column mistakes directly change financial meaning and therefore require near-complete assignment."
+    },
+    "note_location_confidence": {
+      "threshold": 0.8,
+      "comparator": "gte",
+      "action": "stop",
+      "rationale": "A weak note location can route every later stage to unrelated pages."
+    },
+    "note_data_cell_assignment_rate": {
+      "threshold": 0.9,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "Sparse OCR damage may be retained with warnings, but broad column-assignment failure requires review."
+    },
+    "note_value_parse_success_rate": {
+      "threshold": 0.8,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "At least 80 percent of visibly numeric note cells should parse; lower rates trigger explicit partial-quality status."
+    },
+    "relation_value_coverage": {
+      "threshold": 1.0,
+      "comparator": "gte",
+      "action": "stop",
+      "rationale": "A required relation cannot be successful while a reporting period remains financially unexplained."
+    },
+    "minimum_final_relation_confidence": {
+      "threshold": 0.75,
+      "comparator": "gte",
+      "action": "continue_with_warning",
+      "rationale": "This is an exploratory manual-review threshold, not a statistically calibrated probability cutoff."
+    },
+    "structural_failure_count": {
+      "threshold": 0,
+      "comparator": "lte",
+      "action": "stop",
+      "rationale": "Missing pages, periods, notes, tables, or referenced rows invalidate the output structure."
+    },
+    "format_violation_count": {
+      "threshold": 0,
+      "comparator": "lte",
+      "action": "stop",
+      "rationale": "Invalid confidence, bounding-box, or normalized-value representations violate the output contract."
+    },
+    "financial_reconciliation_failure_count": {
+      "threshold": 0,
+      "comparator": "lte",
+      "action": "stop",
+      "rationale": "An applicable exact financial reconciliation must not disagree silently."
+    },
+    "financial_reconciliation_incomplete_count": {
+      "threshold": 0,
+      "comparator": "lte",
+      "action": "continue_with_warning",
+      "rationale": "OCR-damaged inputs may prevent a reconciliation; incompleteness remains visible without inventing values."
+    },
+    "upstream_warning_count": {
+      "threshold": 0,
+      "comparator": "lte",
+      "action": "continue_with_warning",
+      "rationale": "Warnings from extraction and model stages must propagate into the validation status."
+    }
+  }
+}

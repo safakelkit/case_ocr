@@ -1,0 +1,292 @@
+{
+  "schema_version": "1.0",
+  "run_id": "20261015T084746011974Z",
+  "status": "completed_with_warnings",
+  "started_at": "2026-10-15T08:47:46.011735+00:00",
+  "finished_at": "2026-10-15T08:49:57.212205+00:00",
+  "random_seed": 0,
+  "determinism": "No stochastic runtime algorithm is used; seed is recorded for future-compatible stages.",
+  "source": {
+    "file_name": "report.pdf",
+    "size_bytes": 2545619,
+    "sha256": "25e4afe4c27bd2b3bb17a943a323e265520e68981c349f300d9248b3f3bfd7e0"
+  },
+  "configuration": {
+    "file_name": "default.json",
+    "sha256": "4141aa590a98e70ef6f8e4136fdf4ff3a6c5eca9fb8e89f15138d479e3a38ab3"
+  },
+  "environment": {
+    "python": "3.13.0",
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "packages": {
+      "ykt-case": "0.1.0",
+      "fastembed": "0.9.0",
+      "onnxruntime": "1.31.0",
+      "numpy": "2.5.4",
+      "tokenizers": "0.23.3",
+      "tqdm": "4.70.1"
+    },
+    "system_dependencies": {
+      "tesseract": "tesseract 5.5.2",
+      "pdftoppm": "pdftoppm version 26.10.0"
+    }
+  },
+  "git": {
+    "commit": null,
+    "dirty": true
+  },
+  "event_log": "outputs/run_events.jsonl",
+  "stages": [
+    {
+      "stage": "summary_ocr",
+      "status": "completed",
+      "started_at": "2026-10-15T08:47:46.110462+00:00",
+      "finished_at": "2026-10-15T08:47:52.521494+00:00",
+      "duration_seconds": 6.409685,
+      "output": "work/ocr/summary_ocr.json",
+      "output_sha256": "7f470164ee5f78a7aed5c97a86fce46f5cebc55059695af9494f06e13c015f3e"
+    },
+    {
+      "stage": "summary_structure",
+      "status": "completed_with_warnings",
+      "started_at": "2026-10-15T08:47:52.522349+00:00",
+      "finished_at": "2026-10-15T08:47:52.533168+00:00",
+      "duration_seconds": 0.009525,
+      "output": "work/structured/summary_tables.json",
+      "output_sha256": "3b69dfae01db937c83b7b43061519bd15ae8c81decf013824d51131724c0d7f8"
+    },
+    {
+      "stage": "note_location",
+      "status": "completed",
+      "started_at": "2026-10-15T08:47:52.533852+00:00",
+      "finished_at": "2026-10-15T08:49:49.369643+00:00",
+      "duration_seconds": 116.837466,
+      "output": "work/notes/note_locations.json",
+      "output_sha256": "0dd1c0fbe5f4d60d9d343b3323fb4ff5c0abdf7f094184b2e15b746f3373d830"
+    },
+    {
+      "stage": "note_extraction",
+      "status": "completed_with_warnings",
+      "started_at": "2026-10-15T08:49:49.371089+00:00",
+      "finished_at": "2026-10-15T08:49:55.862339+00:00",
+      "duration_seconds": 6.490955,
+      "output": "work/structured/note_tables.json",
+      "output_sha256": "4099751a05d1f74573b539d27c9af12de6b2ee983c6e1ecc7a52a33ead31bdeb"
+    },
+    {
+      "stage": "relation_matching_baseline",
+      "status": "completed",
+      "started_at": "2026-10-15T08:49:55.863333+00:00",
+      "finished_at": "2026-10-15T08:49:55.868550+00:00",
+      "duration_seconds": 0.005063,
+      "output": "work/matching/baseline_relations.json",
+      "output_sha256": "33217913a0877c6b5db972029a715f4f7e31c6393ee8ffc00c19685b49290b7c"
+    },
+    {
+      "stage": "relation_matching_semantic",
+      "status": "completed",
+      "started_at": "2026-10-15T08:49:55.869074+00:00",
+      "finished_at": "2026-10-15T08:49:57.181655+00:00",
+      "duration_seconds": 1.31228,
+      "output": "work/matching/semantic_relations.json",
+      "output_sha256": "65fa76cac133e20679eb919f22bcd2078dec876ab2ab3198b72afba171f19728"
+    },
+    {
+      "stage": "confidence_and_validation",
+      "status": "completed_with_warnings",
+      "started_at": "2026-10-15T08:49:57.182600+00:00",
+      "finished_at": "2026-10-15T08:49:57.196172+00:00",
+      "duration_seconds": 0.013422,
+      "output": "work/validation/validation_report.json",
+      "output_sha256": "aa0dd66e0564c1121b4e2481b92d6468e413209dff4c5470bed638f9fe1e2d58"
+    }
+  ],
+  "models": [
+    {
+      "provider": "fastembed",
+      "provider_version": "0.9.0",
+      "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "runtime": "onnxruntime_cpu",
+      "embedding_dimension": 384,
+      "license": "apache-2.0",
+      "declared_size_gb": 0.22,
+      "model_sources": {
+        "hf": "Qdrant/paraphrase-multilingual-MiniLM-L12-v2-onnx-Q",
+        "url": null,
+        "_deprecated_tar_struct": false
+      },
+      "source_revision": "faf4aa4225822f3bc6376869cb1164e8e3feedd0",
+      "cache_dir": "work/models/fastembed",
+      "threads": 4,
+      "download_allowed": true,
+      "device": "cpu"
+    }
+  ],
+  "quality_gates": [
+    {
+      "gate": "summary_ocr_mean_confidence",
+      "observed": 0.942237,
+      "threshold": 0.9,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue",
+      "rationale": "A page-level mean below 0.90 warrants review, while structural checks decide whether extraction must stop."
+    },
+    {
+      "gate": "summary_ocr_p10_confidence",
+      "observed": 0.921169,
+      "threshold": 0.8,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue",
+      "rationale": "The lower-confidence tail is monitored independently so a high mean cannot hide weak tokens."
+    },
+    {
+      "gate": "period_header_coverage",
+      "observed": 1.0,
+      "threshold": 1.0,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "Every configured summary table must expose all reporting periods before financial cells can be interpreted safely."
+    },
+    {
+      "gate": "summary_row_label_assignment_rate",
+      "observed": 0.925926,
+      "threshold": 0.9,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue",
+      "rationale": "At least 90 percent of financial rows should retain labels; unlabeled values remain inspectable rather than guessed."
+    },
+    {
+      "gate": "summary_period_cell_assignment_rate",
+      "observed": 1.0,
+      "threshold": 0.98,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "Period-column mistakes directly change financial meaning and therefore require near-complete assignment."
+    },
+    {
+      "gate": "note_location_confidence",
+      "observed": 0.956727,
+      "threshold": 0.8,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "A weak note location can route every later stage to unrelated pages."
+    },
+    {
+      "gate": "note_data_cell_assignment_rate",
+      "observed": 0.933333,
+      "threshold": 0.9,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue",
+      "rationale": "Sparse OCR damage may be retained with warnings, but broad column-assignment failure requires review."
+    },
+    {
+      "gate": "note_value_parse_success_rate",
+      "observed": 0.5,
+      "threshold": 0.8,
+      "comparator": "gte",
+      "passed": false,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue_with_warning",
+      "rationale": "At least 80 percent of visibly numeric note cells should parse; lower rates trigger explicit partial-quality status."
+    },
+    {
+      "gate": "relation_value_coverage",
+      "observed": 1.0,
+      "threshold": 1.0,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "A required relation cannot be successful while a reporting period remains financially unexplained."
+    },
+    {
+      "gate": "minimum_final_relation_confidence",
+      "observed": 0.856148,
+      "threshold": 0.75,
+      "comparator": "gte",
+      "passed": true,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue",
+      "rationale": "This is an exploratory manual-review threshold, not a statistically calibrated probability cutoff."
+    },
+    {
+      "gate": "structural_failure_count",
+      "observed": 0.0,
+      "threshold": 0.0,
+      "comparator": "lte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "Missing pages, periods, notes, tables, or referenced rows invalidate the output structure."
+    },
+    {
+      "gate": "format_violation_count",
+      "observed": 0.0,
+      "threshold": 0.0,
+      "comparator": "lte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "Invalid confidence, bounding-box, or normalized-value representations violate the output contract."
+    },
+    {
+      "gate": "financial_reconciliation_failure_count",
+      "observed": 0.0,
+      "threshold": 0.0,
+      "comparator": "lte",
+      "passed": true,
+      "configured_action": "stop",
+      "outcome": "continue",
+      "rationale": "An applicable exact financial reconciliation must not disagree silently."
+    },
+    {
+      "gate": "financial_reconciliation_incomplete_count",
+      "observed": 3.0,
+      "threshold": 0.0,
+      "comparator": "lte",
+      "passed": false,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue_with_warning",
+      "rationale": "OCR-damaged inputs may prevent a reconciliation; incompleteness remains visible without inventing values."
+    },
+    {
+      "gate": "upstream_warning_count",
+      "observed": 11.0,
+      "threshold": 0.0,
+      "comparator": "lte",
+      "passed": false,
+      "configured_action": "continue_with_warning",
+      "outcome": "continue_with_warning",
+      "rationale": "Warnings from extraction and model stages must propagate into the validation status."
+    }
+  ],
+  "validation_summary": {
+    "passed": 15,
+    "failed": 0,
+    "incomplete": 3,
+    "not_applicable": 1,
+    "stop_gate_failures": 0,
+    "warning_gate_failures": 3
+  },
+  "fallback_events": [],
+  "error": null,
+  "final_output": {
+    "path": "outputs/result.json",
+    "sha256": "7f572ae099336bc98d7c286a55b197af691406500ffbd319c84eacbfe6e544c5",
+    "status": "completed_with_warnings"
+  }
+}
